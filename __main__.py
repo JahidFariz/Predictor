@@ -53,6 +53,7 @@ def read_database(url: str):
         next_month_label.config(text="0.00")
         next_year_label.config(text="0.00")
         last_update_label.config(text="N/A")
+        source_label.config(text="N/A")
         footer_label.config(
             text="Created by FOSS KINGDOM, Made with Love in Incredible India."
         )
@@ -97,6 +98,7 @@ def update() -> None:
     next_month_label.config(text="Loading...")
     next_year_label.config(text="Loading...")
     last_update_label.config(text="Loading...")
+    source_label.config(text="Loading...")
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -168,6 +170,7 @@ def update() -> None:
         next_month_label.config(text=f"{round(number=next_month_value, ndigits=4)} INR")
         next_year_label.config(text=f"{round(number=next_year_value, ndigits=4)} INR")
         last_update_label.config(text=list(data["date"])[-1])
+        source_label.config(text="https://www.google.com/finance/quote/USD-INR")
 
     if choice.get() == 2:
         data = read_database(
@@ -232,6 +235,7 @@ def update() -> None:
         next_month_label.config(text=f"{round(number=next_month_value, ndigits=2)} INR")
         next_year_label.config(text=f"{round(number=next_year_value, ndigits=2)} INR")
         last_update_label.config(text=list(data["date"])[-1])
+        source_label.config(text="https://www.mmtcpamp.com/")
 
     graph.legend()
     canvas.draw()
@@ -521,6 +525,14 @@ try:
         master=label_frame_2, bg=theme_color["light"], text="N/A"
     )
     last_update_label.grid(row=9, column=1, padx=10, sticky=W)
+
+    Label(master=label_frame_2, bg=theme_color["light"], text="Source:").grid(
+        row=10, column=0, padx=10, sticky=W
+    )
+    source_label: Label = Label(
+        master=label_frame_2, bg=theme_color["light"], text="N/A"
+    )
+    source_label.grid(row=10, column=1, padx=10, sticky=W)
 
     progress_frame: Frame = Frame(master=app, bg=theme_color["light"])
     progress_frame.pack(fill=X)
