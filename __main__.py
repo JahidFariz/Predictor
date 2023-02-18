@@ -5,7 +5,6 @@ def exit_app() -> None:
         app.quit()
         print(F_GREEN + S_BRIGHT + "Bye!!")
         terminate()
-        return None
 
     else:
         app.deiconify()
@@ -17,8 +16,12 @@ def clear_screen() -> None:
         terminal(command="clear")
         return None
 
-    if uname == "Windows":
+    elif uname == "Windows":
         terminal(command="cls")
+        return None
+
+    else:
+        # Working on different operating system.
         return None
 
 
@@ -53,6 +56,7 @@ def read_database(url: str):
         footer_label.config(
             text="Created by FOSS KINGDOM, Made with Love in Incredible India."
         )
+
         app.update()
 
         clear_screen()
@@ -255,7 +259,7 @@ try:
     print("[INFO]\tImporting built-in libraries, Please wait...")
     from datetime import datetime
     from os import system as terminal
-    from os.path import isfile
+    from os.path import isfile, join
     from pathlib import Path
     from platform import system as environment
     from sys import exit as terminate
@@ -274,6 +278,7 @@ try:
         IntVar,
         Label,
         LabelFrame,
+        PhotoImage,
         Radiobutton,
         Tk,
         W,
@@ -337,6 +342,12 @@ try:
     app: Tk = Tk()
     app.title("Predictor")
     app.resizable(width=False, height=False)
+
+    logo_file: str = join(base_path, "./predictive-chart.png")
+    logo: PhotoImage = PhotoImage(file=logo_file)
+
+    app.iconphoto(True, logo)
+
     app.bind(sequence="Q", func=lambda event: exit_app())
     app.bind(sequence="q", func=lambda event: exit_app())
     app.bind(sequence="<Escape>", func=lambda event: exit_app())
