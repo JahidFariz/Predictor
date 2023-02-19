@@ -4,6 +4,7 @@ def exit_app() -> None:
     if askyesno(title="Predictor", message="Are you sure do you really want to quit?"):
         app.quit()
         print(F_GREEN + S_BRIGHT + "Bye!!")
+        clear_cache()
         terminate()
 
     else:
@@ -23,6 +24,14 @@ def clear_screen() -> None:
     else:
         # Working on different operating system.
         return None
+
+
+def clear_cache() -> None:
+    cache_dir: str = join(base_path, "__pycache__")
+
+    if isdir(s=cache_dir):
+        print("Clearing cache files, Please wait...")
+        rmtree(path=cache_dir)
 
 
 def read_database(url: str):
@@ -263,9 +272,10 @@ try:
     print("[INFO]\tImporting built-in libraries, Please wait...")
     from datetime import datetime
     from os import system as terminal
-    from os.path import isfile, join
+    from os.path import isdir, isfile, join
     from pathlib import Path
     from platform import system as environment
+    from shutil import rmtree
     from sys import exit as terminate
     from tkinter import (
         BOTH,
@@ -282,6 +292,7 @@ try:
         IntVar,
         Label,
         LabelFrame,
+        Menu,
         PhotoImage,
         Radiobutton,
         Tk,
@@ -291,6 +302,7 @@ try:
     from tkinter.messagebox import askyesno, showerror
     from tkinter.ttk import Notebook, Progressbar
     from urllib.error import URLError
+    from webbrowser import open as browser
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import Back, Fore, Style, init
@@ -356,7 +368,26 @@ try:
     app.bind(sequence="q", func=lambda event: exit_app())
     app.bind(sequence="<Escape>", func=lambda event: exit_app())
 
-    app.config(bg=theme_color["light"])
+    menu_bar: Menu = Menu(master=app)
+
+    app.config(bg=theme_color["light"], menu=menu_bar)
+
+    file_menu: Menu = Menu(master=menu_bar, tearoff=False)
+    menu_bar.add_cascade(label="File", menu=file_menu)
+    file_menu.add_command(label="Open")
+    file_menu.add_command(label="Predict")
+    file_menu.add_command(label="Exit", command=lambda event: exit_app())
+
+    help_menu: Menu = Menu(master=menu_bar, tearoff=False)
+    menu_bar.add_cascade(label="Help", menu=help_menu)
+    help_menu.add_command(
+        label="About",
+        command=lambda: browser(url="https://github.com/JahidFariz/Predictor#readme"),
+    )
+    help_menu.add_command(
+        label="Make a donation",
+        command=lambda: browser(url="https://paypal.me/jahidfariz"),
+    )
 
     header_label: Label = Label(
         master=app, text="Welcome to Predictor", bg="#000", fg="#FFF"
