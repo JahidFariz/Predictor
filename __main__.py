@@ -52,17 +52,19 @@ def read_database(url: str):
 
         exit_button.config(state=NORMAL)
 
+        source_label.config(text="N/A")
+        last_update_label.config(text="N/A")
         minimum_value_label.config(text="0.00")
         average_value_label.config(text="0.00")
         maximum_value_label.config(text="0.00")
         delta_value_label.config(text="0.00")
-        status_label.config(text="N/A")
         tomorrow_label.config(text="0.00")
         next_week_label.config(text="0.00")
         next_month_label.config(text="0.00")
         next_year_label.config(text="0.00")
-        last_update_label.config(text="N/A")
-        source_label.config(text="N/A")
+        coefficient_label.config(text="0.00")
+        intercept_label.config(text="0.00")
+        status_label.config(text="N/A")
         footer_label.config(
             text="Created by FOSS KINGDOM, Made with Love in Incredible India."
         )
@@ -97,17 +99,19 @@ def update() -> None:
     graph.cla()
     graph.grid(visible=True)
 
+    source_label.config(text="Loading...")
+    last_update_label.config(text="Loading...")
     minimum_value_label.config(text="Loading...")
     average_value_label.config(text="Loading...")
     maximum_value_label.config(text="Loading...")
     delta_value_label.config(text="Loading...")
-    status_label.config(text="Loading...")
     tomorrow_label.config(text="Loading...")
     next_week_label.config(text="Loading...")
     next_month_label.config(text="Loading...")
     next_year_label.config(text="Loading...")
-    last_update_label.config(text="Loading...")
-    source_label.config(text="Loading...")
+    coefficient_label.config(text="Loading...")
+    intercept_label.config(text="Loading...")
+    status_label.config(text="Loading...")
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -142,6 +146,9 @@ def update() -> None:
             percentage_label.config(text=f"{percentage}%")
             app.update()
 
+        source_label.config(text="https://www.google.com/finance/quote/USD-INR")
+        last_update_label.config(text=list(data["date"])[-1])
+
         total_records: int = len(data)
         min_val: float = min(data["price"])
         avg_val: float = sum(data["price"]) / total_records
@@ -152,15 +159,6 @@ def update() -> None:
         average_value_label.config(text=f"{round(number=avg_val, ndigits=4)} INR")
         maximum_value_label.config(text=f"{max_val} INR")
         delta_value_label.config(text=f"{round(number=delta_change, ndigits=4)} INR")
-
-        if prediction_list[0] > prediction_list[-1]:
-            status_label.config(text="BEAR")
-
-        elif prediction_list[0] == prediction_list[-1]:
-            status_label.config(text="No Change")
-
-        else:
-            status_label.config(text="BULL")
 
         tomorrow_value: float = float(model.predict(X=[[total_records + 1]]))
         next_week_value: float = float(model.predict(X=[[total_records + 7]]))
@@ -178,8 +176,6 @@ def update() -> None:
         next_week_label.config(text=f"{round(number=next_week_value, ndigits=4)} INR")
         next_month_label.config(text=f"{round(number=next_month_value, ndigits=4)} INR")
         next_year_label.config(text=f"{round(number=next_year_value, ndigits=4)} INR")
-        last_update_label.config(text=list(data["date"])[-1])
-        source_label.config(text="https://www.google.com/finance/quote/USD-INR")
 
     if choice.get() == 2:
         data = read_database(
@@ -207,6 +203,9 @@ def update() -> None:
             percentage_label.config(text=f"{percentage}%")
             app.update()
 
+        source_label.config(text="https://www.mmtcpamp.com/")
+        last_update_label.config(text=list(data["date"])[-1])
+
         total_records: int = len(data)
         min_val: float = min(data["price"])
         avg_val: float = sum(data["price"]) / total_records
@@ -217,15 +216,6 @@ def update() -> None:
         average_value_label.config(text=f"{round(number=avg_val, ndigits=2)} INR")
         maximum_value_label.config(text=f"{max_val} INR")
         delta_value_label.config(text=f"{round(number=delta_change, ndigits=2)} INR")
-
-        if prediction_list[0] > prediction_list[-1]:
-            status_label.config(text="BEAR")
-
-        elif prediction_list[0] == prediction_list[-1]:
-            status_label.config(text="No Change")
-
-        else:
-            status_label.config(text="BULL")
 
         tomorrow_value: float = float(model.predict(X=[[total_records + 1]]))
         next_week_value: float = float(model.predict(X=[[total_records + 7]]))
@@ -243,8 +233,6 @@ def update() -> None:
         next_week_label.config(text=f"{round(number=next_week_value, ndigits=2)} INR")
         next_month_label.config(text=f"{round(number=next_month_value, ndigits=2)} INR")
         next_year_label.config(text=f"{round(number=next_year_value, ndigits=2)} INR")
-        last_update_label.config(text=list(data["date"])[-1])
-        source_label.config(text="https://www.mmtcpamp.com/")
 
     graph.legend()
     canvas.draw()
@@ -255,6 +243,18 @@ def update() -> None:
     rb2.config(state=NORMAL)
 
     exit_button.config(state=NORMAL)
+
+    coefficient_label.config(text=f"{float(model.coef_)}")
+    intercept_label.config(text=f"{model.intercept_}")
+
+    if prediction_list[0] > prediction_list[-1]:
+        status_label.config(text="BEAR")
+
+    elif prediction_list[0] == prediction_list[-1]:
+        status_label.config(text="No Change")
+
+    else:
+        status_label.config(text="BULL")
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -343,7 +343,7 @@ try:
             "Importing hidden modules, Please wait..."
         )
         from PIL import _tkinter_finder
-        from pyfiglet import fonts
+        # from pyfiglet import fonts
         from sklearn.metrics._pairwise_distances_reduction import (
             _datasets_pair,
             _middle_term_computer,
@@ -469,101 +469,117 @@ try:
     )
     label_frame_2.pack(padx=10, pady=5, fill=BOTH, expand=TRUE)
 
-    Label(master=label_frame_2, bg=theme_color["light"], text="Minimum:").grid(
+    Label(master=label_frame_2, bg=theme_color["light"], text="Source:").grid(
         row=0, column=0, padx=10, sticky=W
+    )
+    source_label: Label = Label(
+        master=label_frame_2, bg=theme_color["light"], text="N/A"
+    )
+    source_label.grid(row=0, column=1, padx=10, sticky=W)
+
+    Label(master=label_frame_2, bg=theme_color["light"], text="Last Updated:").grid(
+        row=1, column=0, padx=10, sticky=W
+    )
+    last_update_label: Label = Label(
+        master=label_frame_2, bg=theme_color["light"], text="N/A"
+    )
+    last_update_label.grid(row=1, column=1, padx=10, sticky=W)
+
+    Label(master=label_frame_2, bg=theme_color["light"], text="Minimum:").grid(
+        row=2, column=0, padx=10, sticky=W
     )
     minimum_value_label: Label = Label(
         master=label_frame_2, bg=theme_color["light"], text="0.00"
     )
-    minimum_value_label.grid(row=0, column=1, padx=10, sticky=W)
+    minimum_value_label.grid(row=2, column=1, padx=10, sticky=W)
 
     Label(master=label_frame_2, bg=theme_color["light"], text="Average:").grid(
-        row=1, column=0, padx=10, sticky=W
+        row=3, column=0, padx=10, sticky=W
     )
     average_value_label: Label = Label(
         master=label_frame_2, bg=theme_color["light"], text="0.00"
     )
-    average_value_label.grid(row=1, column=1, padx=10, sticky=W)
+    average_value_label.grid(row=3, column=1, padx=10, sticky=W)
 
     Label(master=label_frame_2, bg=theme_color["light"], text="Maximum:").grid(
-        row=2, column=0, padx=10, sticky=W
+        row=4, column=0, padx=10, sticky=W
     )
     maximum_value_label: Label = Label(
         master=label_frame_2, bg=theme_color["light"], text="0.00"
     )
-    maximum_value_label.grid(row=2, column=1, padx=10, sticky=W)
+    maximum_value_label.grid(row=4, column=1, padx=10, sticky=W)
 
     Label(master=label_frame_2, bg=theme_color["light"], text="Delta:").grid(
-        row=3, column=0, padx=10, sticky=W
+        row=5, column=0, padx=10, sticky=W
     )
     delta_value_label: Label = Label(
         master=label_frame_2, bg=theme_color["light"], text="0.00"
     )
-    delta_value_label.grid(row=3, column=1, padx=10, sticky=W)
-
-    Label(master=label_frame_2, bg=theme_color["light"], text="Status:").grid(
-        row=4, column=0, padx=10, sticky=W
-    )
-    status_label: Label = Label(
-        master=label_frame_2, bg=theme_color["light"], text="N/A"
-    )
-    status_label.grid(row=4, column=1, padx=10, sticky=W)
+    delta_value_label.grid(row=5, column=1, padx=10, sticky=W)
 
     Label(
         master=label_frame_2, bg=theme_color["light"], text="Tomorrow expected:"
-    ).grid(row=5, column=0, padx=10, sticky=W)
+    ).grid(row=6, column=0, padx=10, sticky=W)
     tomorrow_label: Label = Label(
         master=label_frame_2,
         bg=theme_color["light"],
         text="0.00",
     )
-    tomorrow_label.grid(row=5, column=1, padx=10, sticky=W)
+    tomorrow_label.grid(row=6, column=1, padx=10, sticky=W)
 
     Label(
         master=label_frame_2, bg=theme_color["light"], text="Next week expected:"
-    ).grid(row=6, column=0, padx=10, sticky=W)
+    ).grid(row=7, column=0, padx=10, sticky=W)
     next_week_label: Label = Label(
         master=label_frame_2,
         bg=theme_color["light"],
         text="0.00",
     )
-    next_week_label.grid(row=6, column=1, padx=10, sticky=W)
+    next_week_label.grid(row=7, column=1, padx=10, sticky=W)
 
     Label(
         master=label_frame_2, bg=theme_color["light"], text="Next month expected:"
-    ).grid(row=7, column=0, padx=10, sticky=W)
+    ).grid(row=8, column=0, padx=10, sticky=W)
     next_month_label: Label = Label(
         master=label_frame_2,
         bg=theme_color["light"],
         text="0.00",
     )
-    next_month_label.grid(row=7, column=1, padx=10, sticky=W)
+    next_month_label.grid(row=8, column=1, padx=10, sticky=W)
 
     Label(
         master=label_frame_2, bg=theme_color["light"], text="Next year expected:"
-    ).grid(row=8, column=0, padx=10, sticky=W)
+    ).grid(row=9, column=0, padx=10, sticky=W)
     next_year_label: Label = Label(
         master=label_frame_2,
         bg=theme_color["light"],
         text="0.00",
     )
-    next_year_label.grid(row=8, column=1, padx=10, sticky=W)
+    next_year_label.grid(row=9, column=1, padx=10, sticky=W)
 
-    Label(master=label_frame_2, bg=theme_color["light"], text="Last Updated on:").grid(
-        row=9, column=0, padx=10, sticky=W
-    )
-    last_update_label: Label = Label(
-        master=label_frame_2, bg=theme_color["light"], text="N/A"
-    )
-    last_update_label.grid(row=9, column=1, padx=10, sticky=W)
-
-    Label(master=label_frame_2, bg=theme_color["light"], text="Source:").grid(
+    Label(master=label_frame_2, bg=theme_color["light"], text="Coefficient:").grid(
         row=10, column=0, padx=10, sticky=W
     )
-    source_label: Label = Label(
+    coefficient_label: Label = Label(
+        master=label_frame_2, bg=theme_color["light"], text="0.00"
+    )
+    coefficient_label.grid(row=10, column=1, padx=10, sticky=W)
+
+    Label(master=label_frame_2, bg=theme_color["light"], text="Intercept:").grid(
+        row=11, column=0, padx=10, sticky=W
+    )
+    intercept_label: Label = Label(
+        master=label_frame_2, bg=theme_color["light"], text="0.00"
+    )
+    intercept_label.grid(row=11, column=1, padx=10, sticky=W)
+
+    Label(master=label_frame_2, bg=theme_color["light"], text="Status:").grid(
+        row=12, column=0, padx=10, sticky=W
+    )
+    status_label: Label = Label(
         master=label_frame_2, bg=theme_color["light"], text="N/A"
     )
-    source_label.grid(row=10, column=1, padx=10, sticky=W)
+    status_label.grid(row=12, column=1, padx=10, sticky=W)
 
     progress_frame: Frame = Frame(master=app, bg=theme_color["light"])
     progress_frame.pack(fill=X)
