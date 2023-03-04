@@ -6,8 +6,11 @@ pandas==1.5.3
 tqdm==4.64.1
 pyfiglet==0.8.post1
 
-# Optional Packages
+# Optional Package
+Pillow==9.4.0
+
+# Experemental Package (for Developers)
 isort==5.12.0
 black==23.1.0
 pyinstaller==5.8.0
-Pillow==9.4.0
+pylint==2.16.3
