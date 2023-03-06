@@ -90,6 +90,11 @@ def loading_ui() -> None:
     This loading_ui function is used to load the user interface.
     """
 
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Loading please wait..."
+    )
+
     header_label.config(text="Loading please wait...")
 
     rb1.config(state="disabled")
@@ -133,12 +138,13 @@ def predict_values(data, x_axis, y_axis, prediction_lst) -> None:
     This predict_values function is used to predict values from the data
     """
 
-    model.fit(X=x_axis.values, y=y_axis)
-
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Estimating Values, Please wait..."
     )
+
+    model.fit(X=x_axis.values, y=y_axis)
+
     for iteration in tqdm(range(1, len(data) + 1)):
         prediction_lst.append(float(model.predict(X=[[iteration]])))
 
@@ -154,7 +160,10 @@ def draw_graph(x_axis, y_axis, prediction_lst):
     This draw_graph function is used to plot the graph on application
     """
 
-    print(f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}{S_RESET_ALL}]\t{S_BRIGHT}Plotting Graph, Please wait...")
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}{S_RESET_ALL}]"
+        f"\t{S_BRIGHT}Plotting Graph, Please wait..."
+    )
 
     if choice.get() == 1:
         fig.suptitle(t="USD to INR Currency Value Predictor")

@@ -1,9 +1,9 @@
 # Mandatory Packages
 scikit-learn==1.2.1
-matplotlib==3.7.0
+matplotlib==3.7.1
 colorama==0.4.6
 pandas==1.5.3
-tqdm==4.64.1
+tqdm==4.65.0
 pyfiglet==0.8.post1
 
 # Optional Package
