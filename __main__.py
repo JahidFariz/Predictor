@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230303
+Version: 20230309
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -52,6 +52,16 @@ def clear_cache() -> None:
         rmtree(path=cache_dir)
 
 
+def figlet_banner(font: str) -> None:
+    """
+    This figlet_banner function is used to print the figlet text on console
+    """
+
+    print()
+    print(S_BRIGHT + figlet_format(text="Predictor", font=font))
+    print(f"Figlet Font: {font}")
+
+
 def read_database(url: str):
     """
     This read_database function is used to read the csv files from the internet.
@@ -62,7 +72,9 @@ def read_database(url: str):
             f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
             f"{S_RESET_ALL}]\t{S_BRIGHT}Reading database, Please wait..."
         )
-        data: read_csv = read_csv(filepath_or_buffer=url)
+        with urlopen(url, timeout=10) as response:
+            data: read_csv = read_csv(filepath_or_buffer=response, encoding="utf-8")
+            response.close()
 
         return data
 
@@ -71,7 +83,10 @@ def read_database(url: str):
         clear_screen()
 
         print(F_BLUE + "=" * 80)
+        figlet_banner(font=selected_figlet_font)
+        print(F_BLUE + "=" * 80)
         print(f"{S_BRIGHT}Failed to read database...")
+        print(f"{S_BRIGHT}Error Code: urllib.error.URLError")
         print(
             f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
             f"{S_RESET_ALL}]\t{S_BRIGHT}{url_error}"
@@ -252,6 +267,8 @@ def reset_ui():
     rb1.config(state="normal")
     rb2.config(state="normal")
 
+    choice.set(value=0)
+
     exit_button.config(state="normal")
 
     fig.suptitle("Graph Area")
@@ -284,22 +301,41 @@ def reset_ui():
     app.update()
 
 
-def update() -> None:
+def usd_to_inr():
+    """
+    This usd_to_inr function is used to predict the USD to INR value
+    """
+
+    choice.set(value=1)
+
+    update(
+        url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
+    )
+
+
+def e_gold_24k():
+    """
+    This e_gold_24 function is used to predict the 24K e-Gold Price
+    """
+
+    choice.set(value=2)
+
+    update(
+        url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
+    )
+
+
+def update(url) -> None:
     """
     This update function is used to update the graph and data when the radio button is clicked.
     """
 
+    # "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
+    # "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
+
     loading_ui()
 
-    if choice.get() == 1:
-        data = read_database(
-            url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
-        )
-
-    else:
-        data = read_database(
-            url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
-        )
+    data = read_database(url=url)
 
     if data is None:
         return None
@@ -342,6 +378,7 @@ try:
     from os.path import isdir, join
     from pathlib import Path
     from platform import system as environment
+    from random import choice
     from shutil import rmtree
     from sys import exit as terminate
     from tkinter import (
@@ -353,12 +390,21 @@ try:
         Menu,
         PhotoImage,
         Radiobutton,
+        TclError,
         Tk,
     )
     from tkinter.messagebox import askyesno, showerror
     from tkinter.ttk import Notebook, Progressbar
     from urllib.error import URLError
+    from urllib.request import urlopen
     from webbrowser import open as browser
+
+    base_path: Path = Path(__file__).parent
+    uname: str = environment()
+    __version__: str = "v.20230309"
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting constants module, Please wait...")
+    from constants import F_BLUE, F_GREEN, F_RED, S_BRIGHT, S_RESET_ALL
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import init
@@ -368,18 +414,11 @@ try:
     )
     from matplotlib.figure import Figure
     from pandas import read_csv
+    from pyfiglet import FigletFont, figlet_format
     from sklearn.linear_model import LinearRegression
     from tqdm import tqdm
 
-    base_path: Path = Path(__file__).parent
-    uname: str = environment()
-
-    F_GREEN: str = "\x1b[32m"  # Fore.GREEN
-    F_BLUE: str = "\x1b[34m"  # Fore.BLUE
-    F_RED: str = "\x1b[31m"  # Fore.RED
-
-    S_BRIGHT: str = "\x1b[1m"  # Style.BRIGHT
-    S_RESET_ALL: str = "\x1b[0m"  # Style.RESET_ALL
+    selected_figlet_font: str = choice(FigletFont.getFonts())
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
@@ -399,8 +438,13 @@ try:
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Loading GUI Application, Please wait..."
     )
+
+    print(F_BLUE + "=" * 80)
+    figlet_banner(font=selected_figlet_font)
+    print(F_BLUE + "=" * 80)
+
     app: Tk = Tk()
-    app.title("Predictor")
+    app.title(string=f"Predictor {__version__}")
     app.resizable(width=False, height=False)
 
     logo_file: str = join(base_path, "./predictive-chart.png")
@@ -416,20 +460,34 @@ try:
 
     app.config(bg=theme_color["light"], menu=menu_bar)
 
+    # File Menu
     file_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="File", menu=file_menu)
-    file_menu.add_command(label="Open")
-    file_menu.add_command(label="Predict")
-    file_menu.add_command(label="Exit", command=exit_app)
+    file_menu.add_command(label="Open", accelerator="(Ctrl+O)")
+    predict_menu: Menu = Menu(master=file_menu, tearoff=False)
+    file_menu.add_cascade(label="Predict", menu=predict_menu)
+    predict_menu.add_command(label="USD to INR", command=usd_to_inr)
+    predict_menu.add_command(label="24K e-Gold", command=e_gold_24k)
+    predict_menu.add_separator()
+    predict_menu.add_command(label="Custom")
+    goto_menu: Menu = Menu(master=file_menu, tearoff=False)
+    file_menu.add_cascade(label="Goto", menu=goto_menu)
+    goto_menu.add_command(label="Graph", command=lambda: tab_view.select(tab_id=0))
+    goto_menu.add_command(label="Data", command=lambda: tab_view.select(tab_id=1))
+    file_menu.add_separator()
+    file_menu.add_command(label="Exit", accelerator="(Ctrl+Q)", command=exit_app)
 
+    # Help Menu
     help_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="Help", menu=help_menu)
     help_menu.add_command(
         label="About",
+        accelerator="(\u2139\ufe0f)",
         command=lambda: browser(url="https://github.com/JahidFariz/Predictor#readme"),
     )
     help_menu.add_command(
         label="Make a donation",
+        accelerator="($)",
         command=lambda: browser(url="https://paypal.me/jahidfariz"),
     )
 
@@ -455,7 +513,7 @@ try:
         text="United State Dollar to India Rupees Value",
         variable=choice,
         value=1,
-        command=update,
+        command=usd_to_inr,
     )
     rb1.grid(row=0, column=0, sticky="w")
 
@@ -466,7 +524,7 @@ try:
         text="24K e-Gold Price by MMTC-PAMP",
         variable=choice,
         value=2,
-        command=update,
+        command=e_gold_24k,
     )
     rb2.grid(row=1, column=0, sticky="w")
 
@@ -655,11 +713,35 @@ try:
 
     app.mainloop()
 
+except TclError as tcl_error:
+    clear_screen()
+
+    print(F_BLUE + "=" * 80)
+
+    figlet_banner(font="standard")
+
+    print(F_BLUE + "=" * 80)
+
+    print(S_BRIGHT + "Error Code: tkinter.TclError")
+    print(
+        f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}{S_RESET_ALL}]"
+        f"\t{S_BRIGHT}Sorry, an error occurred! {tcl_error}"
+    )
+
+    print(F_BLUE + "=" * 80)
+
+    print(F_GREEN + S_BRIGHT + "Bye!!")
+
 except ModuleNotFoundError as module_not_found_error:
+    clear_screen()
+
     print("=" * 80)
+
     print("Error Code: builtins.ModuleNotFoundError")
     print(
         f"[ERROR]\t[{datetime.now()}]\tSorry, an error occurred! {module_not_found_error}"
     )
+
     print("=" * 80)
+
     print("Bye!!")

@@ -6,7 +6,6 @@ if [ -f "./requirements.txt" ]; then
 fi
 
 if [ -f "./__main__.py" ]; then
-    # WARNING: Ignoring icon; supported only on Windows and macOS!
     python3 -m isort ./__main__.py; black ./__main__.py; echo; python3 -m pylint ./__main__.py; echo; pyinstaller ./__main__.py -n "Predictor" --add-data="./predictive-chart.png:./" --add-data="./venv/lib/python3.*/site-packages/pyfiglet/fonts/*:./pyfiglet/fonts/" --hidden-import="PIL._tkinter_finder" --hidden-import="sklearn.metrics._pairwise_distances_reduction._datasets_pair" --hidden-import="sklearn.metrics._pairwise_distances_reduction._middle_term_computer" -Fy; echo;
 fi
 
