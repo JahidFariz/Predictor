@@ -7,6 +7,15 @@ It is a supervised machine learning algorithm to predict the future data.
 """
 
 
+def special_day_banner(msg: str):
+    """
+    This special_day_banner function is used to display about the event of the day
+    """
+
+    special_day_label: Label = Label(master=app, text=msg, bg="yellow")
+    special_day_label.pack(fill="x")
+
+
 def exit_app() -> None:
     """
     This exit_app function used to exit the tkinter application
@@ -25,7 +34,7 @@ def exit_app() -> None:
         return None
 
 
-def clear_screen() -> None:
+def clrscr() -> None:
     """
     This clear_screen function is used to clear the console screen
     """
@@ -60,44 +69,6 @@ def figlet_banner(font: str) -> None:
     print()
     print(S_BRIGHT + figlet_format(text="Predictor", font=font))
     print(f"Figlet Font: {font}")
-
-
-def read_database(url: str):
-    """
-    This read_database function is used to read the csv files from the internet.
-    """
-
-    try:
-        print(
-            f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
-            f"{S_RESET_ALL}]\t{S_BRIGHT}Reading database, Please wait..."
-        )
-        with urlopen(url, timeout=10) as response:
-            data: read_csv = read_csv(filepath_or_buffer=response, encoding="utf-8")
-            response.close()
-
-        return data
-
-    except URLError as url_error:
-        reset_ui()
-        clear_screen()
-
-        print(F_BLUE + "=" * 80)
-        figlet_banner(font=selected_figlet_font)
-        print(F_BLUE + "=" * 80)
-        print(f"{S_BRIGHT}Failed to read database...")
-        print(f"{S_BRIGHT}Error Code: urllib.error.URLError")
-        print(
-            f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
-            f"{S_RESET_ALL}]\t{S_BRIGHT}{url_error}"
-        )
-        print(F_BLUE + "=" * 80)
-
-        app.withdraw()
-        showerror(title="Predictor", message=str(url_error))
-        app.deiconify()
-
-        return None
 
 
 def loading_ui() -> None:
@@ -330,14 +301,36 @@ def update(url) -> None:
     This update function is used to update the graph and data when the radio button is clicked.
     """
 
-    # "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
-    # "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
-
     loading_ui()
 
-    data = read_database(url=url)
+    try:
+        print(
+            f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+            f"{S_RESET_ALL}]\t{S_BRIGHT}Reading database, Please wait..."
+        )
+        with urlopen(url, timeout=10) as response:
+            data: read_csv = read_csv(filepath_or_buffer=response, encoding="utf-8")
+            response.close()
 
-    if data is None:
+    except URLError as url_error:
+        reset_ui()
+        clrscr()
+
+        print(F_BLUE + "=" * 80)
+        figlet_banner(font=selected_figlet_font)
+        print(F_BLUE + "=" * 80)
+        print(f"{S_BRIGHT}Failed to read database...")
+        print(f"{S_BRIGHT}Error Code: urllib.error.URLError")
+        print(
+            f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+            f"{S_RESET_ALL}]\t{S_BRIGHT}{url_error}"
+        )
+        print(F_BLUE + "=" * 80)
+
+        app.withdraw()
+        showerror(title="Predictor", message=str(url_error))
+        app.deiconify()
+
         return None
 
     prediction_lst: list = []
@@ -372,7 +365,7 @@ def update(url) -> None:
 
 
 try:
-    print("[INFO]\tImporting built-in libraries, Please wait...")
+    print("[INFO]\tImporting libraries, Please wait...")
     from datetime import datetime
     from os import system as terminal
     from os.path import isdir, join
@@ -399,12 +392,10 @@ try:
     from urllib.request import urlopen
     from webbrowser import open as browser
 
+    today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
     __version__: str = "v.20230309"
-
-    print(f"[INFO]\t[{datetime.now()}]\tImporting constants module, Please wait...")
-    from constants import F_BLUE, F_GREEN, F_RED, S_BRIGHT, S_RESET_ALL
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import init
@@ -419,6 +410,9 @@ try:
     from tqdm import tqdm
 
     selected_figlet_font: str = choice(FigletFont.getFonts())
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting constants module, Please wait...")
+    from constants import F_BLUE, F_GREEN, F_RED, S_BRIGHT, S_RESET_ALL
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
@@ -495,6 +489,257 @@ try:
         master=app, text="Welcome to Predictor", bg="#000", fg="#FFF"
     )
     header_label.pack(side="top", fill="x")
+
+    if today.month == 1:
+        if today.day == 1:
+            special_day_banner(msg="Today is New Year's Day")
+
+        if today.day == 26:
+            special_day_banner(msg="Today is India Republic Day")
+
+    if today.month == 2:
+        if today.day == 4:
+            special_day_banner(msg="Today is Sri Lanka Independence Day")
+
+        if today.day == 6:
+            special_day_banner(msg="Today is Waitangi Day")
+
+        if today.day == 14:
+            special_day_banner(msg="Today is Valentine's Day")
+
+        if today.day == 15:
+            special_day_banner(msg="Today is Serbia National Day")
+
+        if today.day == 16:
+            special_day_banner(msg="Today is Lithuania Independence Day")
+
+        if today.day == 24:
+            special_day_banner(msg="Today is Estonia Independence Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Kuwait National Day")
+
+        if today.day == 27:
+            special_day_banner(msg="Today is Dominican Republic Independence Day")
+
+    if today.month == 3:
+        if today.day == 1:
+            special_day_banner(msg="Today is St. David's Day")
+
+        if today.day == 3:
+            special_day_banner(msg="Today is Bulgaria Liberation Day")
+
+        if today.day == 6:
+            special_day_banner(msg="Today is Ghana Independence Day")
+
+        if today.day == 8:
+            special_day_banner(msg="Today is International Women's Day")
+
+    if today.month == 6:
+        if today.day == 17:
+            special_day_banner(msg="Today is Iceland National Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Slovenia National Day")
+
+        if today.day == 27:
+            special_day_banner(msg="Today is Djibouti Independence Day")
+
+    if today.month == 7:
+        if today.day == 1:
+            special_day_banner(msg="Today is Canada Day")
+
+        if today.day == 4:
+            special_day_banner(msg="Today is Fourth of July")
+
+        if today.day == 5:
+            day_list: list = [
+                "Today is Algeria Independence Day",
+                "Today is Venezuela Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 9:
+            special_day_banner(msg="Today is Argentina Independence Day")
+
+        if today.day == 14:
+            special_day_banner(msg="Today is Bastille Day")
+
+        if today.day == 20:
+            special_day_banner(msg="Today is Colombia Independence Day")
+
+        if today.day == 21:
+            special_day_banner(msg="Today is Belgium National Day")
+
+        if today.day == 28:
+            special_day_banner(msg="Today is Peru Independence Day")
+
+    if today.month == 8:
+        if today.day == 1:
+            special_day_banner(msg="Today is Switzerland National Day")
+
+        if today.day == 6:
+            day_list: list = [
+                "Today is Bolivia Independence Day",
+                "Today is Jamaica Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 9:
+            special_day_banner(msg="Today is Singapore National Day")
+
+        if today.day == 10:
+            special_day_banner(msg="Today is Ecuador Independence Day")
+
+        if today.day == 11:
+            special_day_banner(msg="Today is Mountain Day")
+
+        if today.day == 14:
+            special_day_banner(msg="Today is Pakistan Independence Day")
+
+        if today.day == 15:
+            day_list: list = [
+                "Today is National Liberation Day of Korea",
+                "Today is India Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 17:
+            special_day_banner(msg="Today is Indonesia Independence Day")
+
+        if today.day == 24:
+            special_day_banner(msg="Today is Ukraine Independence Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Uruguay Independence Day")
+
+        if today.day == 27:
+            special_day_banner(msg="Today is Republic of Moldova Independence Day")
+
+        if today.day == 31:
+            day_list: list = [
+                "Today is Hari Merdeka",
+                "Today is Trinidad & Tobago Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+    if today.month == 9:
+        if today.day == 1:
+            special_day_banner(msg="Today is Uzbekistan Independence Day")
+
+        if today.day == 2:
+            special_day_banner(msg="Today is Vietnam National Day")
+
+        if today.day == 7:
+            special_day_banner(msg="Today is Brazil Independence Day")
+
+        if today.day == 15:
+            day_list: list = [
+                "Today is Costa Rica Independence Day",
+                "Today is El Salvador Independence Day",
+                "Today is Guatemala Independence Day",
+                "Today is Honduras National Day",
+                "Today is Nicaragua Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 16:
+            special_day_banner(msg="Today is Mexico Independence Day")
+
+        if today.day == 19:
+            special_day_banner(msg="Today is Respect for the Aged Day")
+
+        if today.day == 21:
+            special_day_banner(msg="Today is Armenia Independence Day")
+
+        if today.day == 23:
+            special_day_banner(msg="Today is Saudi Arabia National Day")
+
+    if today.month == 10:
+        if today.day == 1:
+            special_day_banner(msg="Today is Nigeria Independence Day")
+
+        if today.day == 3:
+            special_day_banner(msg="Today is German Unity Day")
+
+        if today.day == 9:
+            day_list: list = ["Today is Hangul Day", "Today is Uganda Independence Day"]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 18:
+            special_day_banner(msg="Today is Azerbaijan Independence Day")
+
+        if today.day == 26:
+            special_day_banner(msg="Today is Austria National Day")
+
+        if today.day == 29:
+            special_day_banner(msg="Today is Turkey National Day")
+
+    if today.month == 11:
+        if today.day == 3:
+            special_day_banner(msg="Today is Panama Independence Day")
+
+        if today.day == 9:
+            special_day_banner(msg="Today is Cambodia Independence Day")
+
+        if today.day == 11:
+            day_list: list = ["Today is Poland National Day", "Today is Veterans Day"]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 17:
+            day_list: list = [
+                "Today is Czech Republic Freedom and Democracy Day",
+                "Today is Slovakia Freedom and Democracy Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 18:
+            day_list: list = [
+                "Today is Oman National Day",
+                "Today is Latvia Independence Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 22:
+            special_day_banner(msg="Today is Lebanon Independence Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Bosnia & Herzegovina Statehood Day")
+
+        if today.day == 28:
+            special_day_banner(msg="Today is Albania Independence Day")
+
+        if today.day == 30:
+            special_day_banner(msg="Today is St. Andrew's Day")
+
+    if today.month == 12:
+        if today.day == 1:
+            special_day_banner(msg="Today is Great Union Day")
+
+        if today.day == 2:
+            special_day_banner(msg="Today is UAE National Day")
+
+        if today.day == 6:
+            special_day_banner(msg="Today is Finland Independence Day")
+
+        if today.day == 9:
+            special_day_banner(msg="Today is Tanzania Independence Day")
+
+        if today.day == 12:
+            special_day_banner(msg="Today is Kenya Independence Day")
+
+        if today.day == 16:
+            day_list: list = [
+                "Today is Kazakhstan Independence Day",
+                "Today is Bahrain National Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 18:
+            special_day_banner(msg="Today is Qatar National Day")
+
+        if today.day == 31:
+            special_day_banner(msg="Today is New Year's Eve")
 
     label_frame_1: LabelFrame = LabelFrame(
         master=app,
@@ -714,7 +959,7 @@ try:
     app.mainloop()
 
 except TclError as tcl_error:
-    clear_screen()
+    clrscr()
 
     print(F_BLUE + "=" * 80)
 
@@ -733,7 +978,7 @@ except TclError as tcl_error:
     print(F_GREEN + S_BRIGHT + "Bye!!")
 
 except ModuleNotFoundError as module_not_found_error:
-    clear_screen()
+    clrscr()
 
     print("=" * 80)
 

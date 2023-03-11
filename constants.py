@@ -1,3 +1,7 @@
+"""
+This constants file is used to store constant variables only.
+"""
+
 F_GREEN: str = "\x1b[32m"  # Fore.GREEN
 F_BLUE: str = "\x1b[34m"  # Fore.BLUE
 F_RED: str = "\x1b[31m"  # Fore.RED
