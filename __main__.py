@@ -1,10 +1,12 @@
 """
 Author: Mohamed Fariz
-Version: 20230309
+Version: 20230313
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
 """
+
+# pylint: disable=C0302
 
 
 def special_day_banner(msg: str):
@@ -395,7 +397,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230309"
+    __version__: str = "v.20230313"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import init
@@ -471,6 +473,18 @@ try:
     file_menu.add_separator()
     file_menu.add_command(label="Exit", accelerator="(Ctrl+Q)", command=exit_app)
 
+    # Links Menu
+    links_menu: Menu = Menu(master=menu_bar, tearoff=False)
+    menu_bar.add_cascade(label="Links", menu=links_menu)
+    links_menu.add_command(label="License")
+    links_menu.add_command(label="Video")
+    links_menu.add_command(label="Source Code")
+    links_menu.add_command(label="Issues")
+    links_menu.add_command(label="Translation")
+    links_menu.add_command(label="Changelog")
+    links_menu.add_command(label="Website")
+    links_menu.add_command(label="E-Mail Author")
+
     # Help Menu
     help_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="Help", menu=help_menu)
@@ -535,7 +549,68 @@ try:
         if today.day == 8:
             special_day_banner(msg="Today is International Women's Day")
 
+        if today.day == 15:
+            special_day_banner(msg="Today is Hungary National Day")
+
+        if today.day == 20:
+            special_day_banner(msg="Today is Tunisia National Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Greece National Day")
+
+        if today.day == 26:
+            special_day_banner(msg="Today is Bangladesh Independence Day")
+
+    if today.month == 4:
+        if today.day == 4:
+            special_day_banner(msg="Today is Senegal Independence Day")
+
+        if today.day == 22:
+            special_day_banner(msg="Today is Earth Day")
+
+        if today.day == 23:
+            day_list: list = [
+                "Today is National Sovereignty and Children's Day",
+                "Today is St. George's Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+        if today.day == 27:
+            day_list: list = [
+                "Today is King's Day",
+                "Today is South Africa Freedom Day",
+            ]
+            special_day_banner(msg=choice(seq=day_list))
+
+    if today.day == 5:
+        if today.day == 5:
+            special_day_banner(msg="Today is Israel Independence Day")
+
+        if today.day == 17:
+            special_day_banner(msg="Today is Norway Constitution Day")
+
+        if today.day == 25:
+            special_day_banner(msg="Today is Jordan Independence Day")
+
+        if today.day == 26:
+            special_day_banner(msg="Today is Georgia Independence Day")
+
     if today.month == 6:
+        if today.day == 2:
+            special_day_banner(msg="Today is Italy Republic Day")
+
+        if today.day == 5:
+            special_day_banner(msg="Today is Denmark Constitution Day")
+
+        if today.day == 6:
+            special_day_banner(msg="Today is Sweden National Day")
+
+        if today.day == 10:
+            special_day_banner(msg="Today is Portugal National Day")
+
+        if today.day == 12:
+            special_day_banner(msg="Today is Philippines Independence Day")
+
         if today.day == 17:
             special_day_banner(msg="Today is Iceland National Day")
 
@@ -773,22 +848,6 @@ try:
     )
     rb2.grid(row=1, column=0, sticky="w")
 
-    button_frame: Frame = Frame(master=app, bg=theme_color["light"])
-    button_frame.pack(fill="both", pady=5)
-
-    exit_button: Button = Button(
-        master=button_frame,
-        text="EXIT",
-        bg="#CE313A",
-        fg="white",
-        width=10,
-        activebackground="red",
-        activeforeground="white",
-        command=exit_app,
-    )
-    exit_button.bind(sequence="<Return>", func=lambda event: exit_app())
-    exit_button.pack()
-
     tab_view: Notebook = Notebook(master=app)
     tab_view.pack(fill="both", expand=True)
 
@@ -935,18 +994,31 @@ try:
     )
     source_button.grid(row=12, column=0, padx=10, pady=5, sticky="w")
 
-    progress_frame: Frame = Frame(master=app, bg=theme_color["light"])
-    progress_frame.pack(fill="x")
+    bottom_frame: Frame = Frame(master=app, bg=theme_color["light"])
+    bottom_frame.pack(fill="x", pady=5)
 
     progress_bar: Progressbar = Progressbar(
-        master=progress_frame, orient="horizontal", mode="determinate"
+        master=bottom_frame, orient="horizontal", mode="determinate"
     )
-    progress_bar.pack(pady=10, fill="x", expand=True, padx=10, side="left")
+    progress_bar.pack(fill="x", expand=True, padx=10, side="left")
 
     percentage_label: Label = Label(
-        master=progress_frame, text="0.00%", bg=theme_color["light"]
+        master=bottom_frame, text="0.00%", bg=theme_color["light"]
     )
-    percentage_label.pack(pady=10, padx=5, side="right")
+    percentage_label.pack(side="left")
+
+    exit_button: Button = Button(
+        master=bottom_frame,
+        text="EXIT",
+        bg="#CE313A",
+        fg="white",
+        width=10,
+        activebackground="red",
+        activeforeground="white",
+        command=exit_app,
+    )
+    exit_button.bind(sequence="<Return>", func=lambda event: exit_app())
+    exit_button.pack(padx=10, side="left")
 
     footer_label: Label = Label(
         master=app,
