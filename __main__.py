@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230314
+Version: 20230315
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -395,7 +395,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230314"
+    __version__: str = "v.20230315"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import init
@@ -441,6 +441,9 @@ try:
 
     app: Tk = Tk()
     app.title(string=f"Predictor {__version__}")
+    x_axis_resolution: int = app.winfo_screenwidth()
+    y_axis_resolution: int = app.winfo_screenheight()
+    app.maxsize(width=x_axis_resolution, height=y_axis_resolution)
     app.resizable(width=False, height=False)
 
     logo_file: str = join(base_path, "./assets/predictive-chart.png")
@@ -455,26 +458,81 @@ try:
 
     app.config(bg=theme_color["light"], menu=menu_bar)
 
+    # <a href="https://www.flaticon.com/free-icons/money" title="money icons">
+    # Money icons created by vectorsmarket15 - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/money_2704332?term=dollar&page=1&position=8&origin=search&related_id=2704332
+    money_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/money.png")).resize(size=(20, 20))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/gold" title="gold icons">
+    # Gold icons created by photo3idea_studio - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/ingots_1473504?term=gold&page=1&position=1&origin=search&related_id=1473504
+    gold_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/ingots.png")).resize(size=(20, 20))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/profit" title="profit icons">
+    # Profit icons created by Pixel perfect - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/bar-chart_893214?term=graph&page=1&position=48&origin=search&related_id=893214
+    graph_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(20, 20))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/statistics" title="statistics icons">
+    # Statistics icons created by Freepik - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/statistics_2920349?term=data&page=1&position=6&origin=search&related_id=2920349
+    statistic_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/statistics.png")).resize(size=(20, 20))
+    )
+
     # File Menu
     file_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="File", menu=file_menu)
     file_menu.add_command(label="Open", accelerator="(Ctrl+O)")
     predict_menu: Menu = Menu(master=file_menu, tearoff=False)
     file_menu.add_cascade(label="Predict", menu=predict_menu)
-    predict_menu.add_command(label="USD to INR", command=usd_to_inr)
-    predict_menu.add_command(label="24K e-Gold", command=e_gold_24k)
+    predict_menu.add_command(
+        label="USD to INR", image=money_ico, compound="left", command=usd_to_inr
+    )
+    predict_menu.add_command(
+        label="24K e-Gold", image=gold_ico, compound="left", command=e_gold_24k
+    )
     predict_menu.add_separator()
     predict_menu.add_command(label="Custom")
     goto_menu: Menu = Menu(master=file_menu, tearoff=False)
     file_menu.add_cascade(label="Goto", menu=goto_menu)
-    goto_menu.add_command(label="Graph", command=lambda: tab_view.select(tab_id=0))
-    goto_menu.add_command(label="Data", command=lambda: tab_view.select(tab_id=1))
+    goto_menu.add_command(
+        label="Graph",
+        image=graph_ico,
+        compound="left",
+        command=lambda: tab_view.select(tab_id=0),
+    )
+    goto_menu.add_command(
+        label="Data",
+        image=statistic_ico,
+        compound="left",
+        command=lambda: tab_view.select(tab_id=1),
+    )
     file_menu.add_separator()
     file_menu.add_command(label="Exit", accelerator="(Ctrl+Q)", command=exit_app)
 
     license_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/license.png")).resize(size=(20, 20))
     )
+
+    # <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">
+    # Play button icons created by Freepik - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/play_2377793?term=video&page=1&position=46&origin=search&related_id=2377793
+    video_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/play.png")).resize(size=(20, 20))
+    )
+
     source_code_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/programming.png")).resize(
             size=(20, 20)
@@ -483,21 +541,50 @@ try:
     issues_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/bug-report.png")).resize(size=(20, 20))
     )
+
+    # <a href="https://www.flaticon.com/free-icons/translate" title="translate icons">
+    # Translate icons created by icon wind - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/translate_9628122?term=translation&page=1&position=22&origin=search&related_id=9628122
+    translation_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/translate.png")).resize(size=(20, 20))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/notepad" title="notepad icons">
+    # Notepad icons created by Freepik - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/notepad_686234?term=notepad&page=1&position=1&origin=search&related_id=686234
+    changelog_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/notepad.png")).resize(size=(20, 20))
+    )
+
     website_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/web-link.png")).resize(size=(20, 20))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/email" title="email icons">
+    # Email icons created by Fathema Khanom - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/mail_9068642?term=email&page=1&position=25&origin=search&related_id=9068642
+    email_ico: PILPhotoImage = PILPhotoImage(
+        img_open(join(base_path, "./assets/mail.png")).resize(size=(20, 20))
     )
 
     # Links Menu
     links_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="Links", menu=links_menu)
-    links_menu.add_command(label="License", image=license_ico, compound="left")
-    links_menu.add_command(label="Video")
-    links_menu.add_command(label="Source Code", image=source_code_ico, compound="left")
+    links_menu.add_command(
+        label="License (GPL-v3.0)", image=license_ico, compound="left"
+    )
+    links_menu.add_command(label="Video (YouTube)", image=video_ico, compound="left")
+    links_menu.add_command(
+        label="Source Code (GitHub)", image=source_code_ico, compound="left"
+    )
     links_menu.add_command(label="Issues", image=issues_ico, compound="left")
-    links_menu.add_command(label="Translation")
-    links_menu.add_command(label="Changelog")
+    links_menu.add_command(label="Translation", image=translation_ico, compound="left")
+    links_menu.add_command(label="Changelog", image=changelog_ico, compound="left")
     links_menu.add_command(label="Website", image=website_ico, compound="left")
-    links_menu.add_command(label="E-Mail Author")
+    links_menu.add_command(label="E-Mail Author", image=email_ico, compound="left")
 
     donation_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/donation.png")).resize(size=(20, 20))
@@ -507,10 +594,11 @@ try:
     help_menu: Menu = Menu(master=menu_bar, tearoff=False)
     menu_bar.add_cascade(label="Help", menu=help_menu)
     help_menu.add_command(
-        label="About",
+        label="About Predictor",
         accelerator="(\u2139\ufe0f)",
         command=lambda: browser(url="https://github.com/JahidFariz/Predictor#readme"),
     )
+    help_menu.add_separator()
     help_menu.add_command(
         label="Make a donation",
         accelerator="($)",
@@ -885,8 +973,8 @@ try:
     data_frame: Frame = Frame(master=tab_view, bg=theme_color["light"])
     data_frame.pack()
 
-    tab_view.add(child=graph_frame, text="Graph")
-    tab_view.add(child=data_frame, text="Data")
+    tab_view.add(child=graph_frame, text="Graph", image=graph_ico, compound="left")
+    tab_view.add(child=data_frame, text="Data", image=statistic_ico, compound="left")
 
     fig: Figure = Figure()
     fig.suptitle("Graph Area")
@@ -1058,6 +1146,15 @@ try:
     )
     clear_button.bind(sequence="<Return>", func=lambda event: reset_ui())
     clear_button.pack(padx=(5, 5), side="left")
+
+    refresh_button: Button = Button(
+        master=bottom_frame,
+        text="REFRESH",
+        bg="orange",
+        fg="#FFF",
+        activeforeground="#FFF",
+    )
+    refresh_button.pack(padx=(5, 5), side="left")
 
     exit_icon: PILPhotoImage = PILPhotoImage(
         image=img_open(fp=join(base_path, "./assets/logout.png")).resize(size=(16, 16))
