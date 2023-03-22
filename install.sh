@@ -22,7 +22,10 @@ if [ -f "./Predictor.spec" ]; then
 fi
 
 if [ -f "./dist/Predictor" ]; then
-    ./dist/Predictor;
+    cd ./dist/
+    sha256sum ./Predictor > ./Predictor.sha256
+    echo "Installation Completed Successfully!!"
+    # ./Predictor;
 fi
 
 exit;
