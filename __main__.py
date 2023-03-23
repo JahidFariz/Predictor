@@ -334,6 +334,7 @@ def read_database(url: str) -> None:
 
     except URLError as url_error:
         clrscr()
+        reset_ui()
 
         print(F_BLUE + "=" * 80)
         figlet_banner(font=selected_figlet_font)
@@ -351,8 +352,6 @@ def read_database(url: str) -> None:
             title="Predictor", message=f"Failed to read database...\n{str(url_error)}"
         )
         app.deiconify()
-
-        reset_ui()
 
         return None
 
