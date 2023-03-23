@@ -14,6 +14,8 @@ S_RESET_ALL: str = "\x1b[0m"
 
 MOUNTAIN: str = "\u26f0"
 BEATING_HEART: str = "\U0001f493"
+UP_ARROW: str = "\u2b06\ufe0f"
+DOWN_ARROW: str = "\u2b07\ufe0f"
 
 INDIA: str = "\U0001f1ee\U0001f1f3"
 SRI_LANKA: str = "\U0001f1f1\U0001f1f0"

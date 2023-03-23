@@ -75,7 +75,7 @@ def figlet_banner(font: str) -> None:
     print(f"{F_BLUE}Figlet Font: {font}")
 
 
-def loading_ui() -> None:
+def loading_ui(value: int) -> None:
     """
     This loading_ui function is used to load the user interface.
     """
@@ -90,6 +90,7 @@ def loading_ui() -> None:
 
     header_label.config(text="Loading please wait...")
 
+    choice.set(value)
     rb1.config(state="disabled")
     rb2.config(state="disabled")
 
@@ -103,7 +104,7 @@ def loading_ui() -> None:
         refresh_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
-    fig.suptitle("Loading...")
+    fig.suptitle(t="Loading...")
     fig.supxlabel(t="Loading...")
     fig.supylabel(t="Loading...")
 
@@ -111,10 +112,10 @@ def loading_ui() -> None:
     graph.grid(visible=True)
     canvas.draw()
 
-    minimum_value_label.config(text="Loading...")
-    average_value_label.config(text="Loading...")
-    maximum_value_label.config(text="Loading...")
-    delta_value_label.config(text="Loading...")
+    min_val_label.config(text="Loading...")
+    avg_val_label.config(text="Loading...")
+    max_val_label.config(text="Loading...")
+    del_val_label.config(text="Loading...")
     tomorrow_label.config(text="Loading...")
     next_week_label.config(text="Loading...")
     next_month_label.config(text="Loading...")
@@ -134,29 +135,22 @@ def loading_ui() -> None:
     app.update()
 
 
-def predict_values(data, x_axis, y_axis, prediction_lst) -> None:
+def predict_values(prediction_lst: list, total_records: int) -> None:
     """
-    This predict_values function is used to predict values from the data
+    This predict_values function is used to predict the linear line between the data.
     """
 
-    print(
-        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
-        f"{S_RESET_ALL}]\t{S_BRIGHT}Estimating Values, Please wait..."
-    )
-
-    model.fit(X=x_axis.values, y=y_axis)
-
-    for _ in tqdm(range(1, len(data) + 1)):
+    for _ in tqdm(range(1, total_records + 1)):
         prediction_lst.append(float(model.predict(X=[[_]])))
 
-        percentage: float = round(number=_ / len(data) * 100, ndigits=2)
+        percentage: float = round(number=_ / total_records * 100, ndigits=2)
         progress_bar.config(value=percentage)
         percentage_label.config(text=f"{percentage}%")
 
         app.update()
 
 
-def draw_graph(x_axis, y_axis, prediction_lst):
+def draw_graph(x_axis, y_axis, prediction_lst: list) -> None:
     """
     This draw_graph function is used to plot the graph on application
     """
@@ -188,56 +182,57 @@ def draw_graph(x_axis, y_axis, prediction_lst):
     app.update()
 
 
-def display_data(data, prediction_lst):
+def display_data(data, prediction_lst: list, total_records: int) -> None:
     """
     This display_data function is used to display the data to the application.
     """
 
-    total_records: int = len(data)
     min_val: float = min(data["price"])
     avg_val: float = sum(data["price"]) / total_records
     max_val: float = max(data["price"])
+    del_val: float = (prediction_lst[-1] - prediction_lst[0]) / total_records
+    tomorrow_val: float = float(model.predict(X=[[total_records + 1]]))
+    next_week_val: float = float(model.predict(X=[[total_records + 7]]))
+    next_month_val: float = float(model.predict(X=[[total_records + 30.4375]]))
+    next_year_val: float = float(model.predict(X=[[total_records + 365.25]]))
+    coef_val: float = float(model.coef_)
+    intercept_val: float = float(model.intercept_)
+    last_update_val: str = list(data["date"])[-1]
 
-    minimum_value_label.config(text=f"{min_val} INR")
-    average_value_label.config(text=f"{round(number=avg_val, ndigits=2)} INR")
-    maximum_value_label.config(text=f"{max_val} INR")
-    delta_value_label.config(
-        text=f"{round(number=prediction_lst[-1] - prediction_lst[0], ndigits=2)} INR"
-    )
+    min_val_label.config(text=f"₹ {min_val}")
+    max_val_label.config(text=f"₹ {max_val}")
+    coefficient_label.config(text=f"{coef_val}")
+    intercept_label.config(text=f"{intercept_val}")
 
-    tomorrow_label.config(
-        text=f"{round(number=float(model.predict(X=[[total_records + 1]])), ndigits=2)} INR"
-    )
-    next_week_label.config(
-        text=f"{round(number=float(model.predict(X=[[total_records + 7]])), ndigits=2)} INR"
-    )
-    next_month_label.config(
-        text=f"{round(number=float(model.predict(X=[[total_records + 30]])), ndigits=2)} INR"
-    )
-    next_year_label.config(
-        text=f"{round(number=float(model.predict(X=[[total_records + 365]])), ndigits=2)} INR"
-    )
+    if del_val < 0:
+        status_label.config(text=f"BEAR {DOWN_ARROW}")
 
-    coefficient_label.config(text=f"{float(model.coef_)}")
-    intercept_label.config(text=f"{model.intercept_}")
-
-    if prediction_lst[0] > prediction_lst[-1]:
-        status_label.config(text="BEAR")
-
-    elif prediction_lst[0] == prediction_lst[-1]:
+    if del_val == 0:
         status_label.config(text="No Change")
 
-    else:
-        status_label.config(text="BULL")
+    if del_val > 0:
+        status_label.config(text=f"BULL {UP_ARROW}")
 
-    last_update_label.config(text=list(data["date"])[-1])
+    last_update_label.config(text=last_update_val)
 
     if choice.get() == 1:
+        avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=4)}")
+        del_val_label.config(text=f"₹ {round(number=del_val, ndigits=4)}")
+        tomorrow_label.config(text=f"₹ {round(number=tomorrow_val, ndigits=4)}")
+        next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=4)}")
+        next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=4)}")
+        next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=4)}")
         source_button.config(
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
 
-    else:
+    if choice.get() == 2:
+        avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=2)}")
+        del_val_label.config(text=f"₹ {round(number=del_val, ndigits=2)}")
+        tomorrow_label.config(text=f"₹ {round(number=tomorrow_val, ndigits=2)}")
+        next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=2)}")
+        next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=2)}")
+        next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=2)}")
         source_button.config(
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
@@ -257,7 +252,6 @@ def reset_ui():
 
     rb1.config(state="normal")
     rb2.config(state="normal")
-
     choice.set(value=0)
 
     clear_button.config(state="disabled")
@@ -269,7 +263,7 @@ def reset_ui():
         refresh_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
-    fig.suptitle("Graph Area")
+    fig.suptitle(t="Graph Area")
     fig.supxlabel(t="X-Axis")
     fig.supylabel(t="Y-Axis")
 
@@ -277,10 +271,10 @@ def reset_ui():
     graph.grid(visible=True)
     canvas.draw()
 
-    minimum_value_label.config(text="0.00")
-    average_value_label.config(text="0.00")
-    maximum_value_label.config(text="0.00")
-    delta_value_label.config(text="0.00")
+    min_val_label.config(text="0.00")
+    avg_val_label.config(text="0.00")
+    max_val_label.config(text="0.00")
+    del_val_label.config(text="0.00")
     tomorrow_label.config(text="0.00")
     next_week_label.config(text="0.00")
     next_month_label.config(text="0.00")
@@ -299,36 +293,32 @@ def reset_ui():
     app.update()
 
 
-def usd_to_inr():
+def usd_to_inr() -> None:
     """
     This usd_to_inr function is used to predict the USD to INR value
     """
 
-    choice.set(value=1)
-
-    update(
+    loading_ui(value=1)
+    read_database(
         url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
     )
 
 
-def e_gold_24k():
+def e_gold_24k() -> None:
     """
     This e_gold_24 function is used to predict the 24K e-Gold Price
     """
 
-    choice.set(value=2)
-
-    update(
+    loading_ui(value=2)
+    read_database(
         url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
     )
 
 
-def update(url) -> None:
+def read_database(url: str) -> None:
     """
-    This update function is used to update the graph and data when the radio button is clicked.
+    This read_database function is used to read the csv file from the internet.
     """
-
-    loading_ui()
 
     try:
         print(
@@ -338,9 +328,11 @@ def update(url) -> None:
         with urlopen(url, timeout=10) as response:
             data: read_csv = read_csv(filepath_or_buffer=response, encoding="utf-8")
             response.close()
+            update_ui(data)
+
+            return None
 
     except URLError as url_error:
-        reset_ui()
         clrscr()
 
         print(F_BLUE + "=" * 80)
@@ -355,14 +347,32 @@ def update(url) -> None:
         print(F_BLUE + "=" * 80)
 
         app.withdraw()
-        showerror(title="Predictor", message=str(url_error))
+        showerror(
+            title="Predictor", message=f"Failed to read database...\n{str(url_error)}"
+        )
         app.deiconify()
 
+        reset_ui()
+
         return None
+
+
+def update_ui(data) -> None:
+    """
+    This update function is used to update the graph and data when the radio button is clicked.
+    """
 
     prediction_lst: list = []
     x_axis = data[["sl.no"]]
     y_axis = data["price"]
+    total_records: int = len(data)
+
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Estimating Values, Please wait..."
+    )
+
+    model.fit(X=x_axis.values, y=y_axis)
 
     for _ in [1, 4, 5, 7]:
         file_menu.entryconfig(index=_, state="normal")
@@ -385,9 +395,9 @@ def update(url) -> None:
     exit_button.bind(sequence="<Right>", func=lambda event: clear_button.focus())
     exit_button.bind(sequence="<Left>", func=lambda event: refresh_button.focus())
 
-    predict_values(data, x_axis, y_axis, prediction_lst)
+    predict_values(prediction_lst, total_records)
     draw_graph(x_axis, y_axis, prediction_lst)
-    display_data(data, prediction_lst)
+    display_data(data, prediction_lst, total_records)
 
     source_button.config(text="Source", state="normal")
 
@@ -400,16 +410,14 @@ def update(url) -> None:
 
     app.update()
 
-    return None
-
 
 def refresh() -> None:
     """
     This refresh function is used to refresh the graph and data.
     """
 
-    refresh_button.config(text="Refreshing")
-    app.update()
+    # refresh_button.config(text="Refreshing")
+    # app.update()
 
     if choice.get() == 1:
         print(
@@ -427,8 +435,8 @@ def refresh() -> None:
 
         e_gold_24k()
 
-    refresh_button.config(text="Refresh")
-    app.update()
+    # refresh_button.config(text="Refresh")
+    # app.update()
 
 
 try:
@@ -496,6 +504,7 @@ try:
         DENMARK,
         DJIBOUTI,
         DOMNIICAN_REPUBLIC,
+        DOWN_ARROW,
         ECUADOR,
         EL_SALVADOR,
         ESTONIA,
@@ -559,6 +568,7 @@ try:
         UKRAINE,
         UNITED_ARAB_EMIRATES,
         UNITED_STATE,
+        UP_ARROW,
         URUGUAY,
         UZBEKISTAN,
         VENEZUELA,
@@ -1202,7 +1212,7 @@ try:
     app.bind(sequence="<Alt-KeyPress-2>", func=lambda event: tab_view.select(tab_id=1))
 
     fig: Figure = Figure(facecolor=THEME_COLOR["light"])
-    fig.suptitle("Graph Area")
+    fig.suptitle(t="Graph Area")
     fig.supxlabel(t="X-Axis")
     fig.supylabel(t="Y-Axis")
 
@@ -1223,34 +1233,34 @@ try:
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Minimum:").grid(
         row=0, column=0, padx=10, sticky="w"
     )
-    minimum_value_label: Label = Label(
+    min_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    minimum_value_label.grid(row=0, column=1, padx=10, sticky="w")
+    min_val_label.grid(row=0, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Average:").grid(
         row=1, column=0, padx=10, sticky="w"
     )
-    average_value_label: Label = Label(
+    avg_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    average_value_label.grid(row=1, column=1, padx=10, sticky="w")
+    avg_val_label.grid(row=1, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Maximum:").grid(
         row=2, column=0, padx=10, sticky="w"
     )
-    maximum_value_label: Label = Label(
+    max_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    maximum_value_label.grid(row=2, column=1, padx=10, sticky="w")
+    max_val_label.grid(row=2, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Delta:").grid(
         row=3, column=0, padx=10, sticky="w"
     )
-    delta_value_label: Label = Label(
+    del_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    delta_value_label.grid(row=3, column=1, padx=10, sticky="w")
+    del_val_label.grid(row=3, column=1, padx=10, sticky="w")
 
     Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="Tomorrow expected:"
