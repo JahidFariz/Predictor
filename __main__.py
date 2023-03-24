@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230322
+Version: 20230324
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -462,7 +462,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230322"
+    __version__: str = "v.20230324"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
     from colorama import init
@@ -619,7 +619,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/money_2704332?term=dollar&page=1&position=8&origin=search&related_id=2704332
     money_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/money.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/money.png")).resize(size=(20, 20))
     )
 
     # <a href="https://www.flaticon.com/free-icons/gold" title="gold icons">
@@ -627,7 +627,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/ingots_1473504?term=gold&page=1&position=1&origin=search&related_id=1473504
     gold_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/ingots.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/ingots.png")).resize(size=(20, 20))
     )
 
     # <a href="https://www.flaticon.com/free-icons/profit" title="profit icons">
@@ -635,7 +635,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/bar-chart_893214?term=graph&page=1&position=48&origin=search&related_id=893214
     graph_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(20, 20))
     )
 
     # <a href="https://www.flaticon.com/free-icons/statistics" title="statistics icons">
@@ -643,7 +643,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/statistics_2920349?term=data&page=1&position=6&origin=search&related_id=2920349
     statistic_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/statistics.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/statistics.png")).resize(size=(20, 20))
     )
 
     # File Menu
@@ -691,7 +691,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/play_2377793?term=video&page=1&position=46&origin=search&related_id=2377793
     video_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/play.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/play.png")).resize(size=(20, 20))
     )
 
     source_code_ico: PILPhotoImage = PILPhotoImage(
@@ -708,7 +708,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/translate_9628122?term=translation&page=1&position=22&origin=search&related_id=9628122
     translation_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/translate.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/translate.png")).resize(size=(20, 20))
     )
 
     # <a href="https://www.flaticon.com/free-icons/notepad" title="notepad icons">
@@ -716,7 +716,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/notepad_686234?term=notepad&page=1&position=1&origin=search&related_id=686234
     changelog_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/notepad.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/notepad.png")).resize(size=(20, 20))
     )
 
     website_ico: PILPhotoImage = PILPhotoImage(
@@ -728,7 +728,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/mail_9068642?term=email&page=1&position=25&origin=search&related_id=9068642
     email_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/mail.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/mail.png")).resize(size=(20, 20))
     )
 
     # Links Menu
@@ -1136,7 +1136,7 @@ try:
     rb2.grid(row=1, column=0, sticky="w")
 
     buttons_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
-    buttons_frame.pack(pady=(5, 5))
+    buttons_frame.pack(pady=5)
 
     clear_icon: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/clear.png")).resize(size=(16, 16))
@@ -1155,10 +1155,10 @@ try:
         command=reset_ui,
     )
     clear_button.bind(sequence="<Return>", func=lambda event: reset_ui())
-    clear_button.pack(padx=(5, 5), side="left")
+    clear_button.pack(padx=5, side="left")
 
     refresh_ico: PILPhotoImage = PILPhotoImage(
-        img_open(join(base_path, "./assets/refresh.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/refresh.png")).resize(size=(16, 16))
     )
 
     refresh_button: Button = Button(
@@ -1174,7 +1174,7 @@ try:
         command=refresh,
     )
     refresh_button.bind(sequence="<Return>", func=lambda event: refresh())
-    refresh_button.pack(padx=(5, 5), side="left")
+    refresh_button.pack(padx=5, side="left")
 
     exit_icon: PILPhotoImage = PILPhotoImage(
         image=img_open(fp=join(base_path, "./assets/logout.png")).resize(size=(16, 16))
@@ -1227,7 +1227,7 @@ try:
     label_frame_2: LabelFrame = LabelFrame(
         master=data_frame, text="Statistic Data", bg=THEME_COLOR["light"], fg="red"
     )
-    label_frame_2.pack(padx=10, pady=5, fill="both", expand=True)
+    label_frame_2.pack(padx=10, pady=5, fill="both")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Minimum:").grid(
         row=0, column=0, padx=10, sticky="w"
@@ -1349,7 +1349,36 @@ try:
         image=redirect_icon,
         width=80,
     )
-    source_button.grid(row=12, column=0, padx=10, pady=5, sticky="w")
+    source_button.grid(row=13, column=0, padx=10, pady=5, sticky="w")
+
+    label_frame_3: LabelFrame = LabelFrame(
+        master=data_frame, text="Powered by", bg=THEME_COLOR["light"], fg="red"
+    )
+    label_frame_3.pack(padx=10, pady=5, fill="both", expand=True)
+
+    # new_frame: Frame = Frame(master=data_frame, bg=THEME_COLOR["light"])
+    # new_frame.pack()
+
+    # <a href="https://www.flaticon.com/free-icons/google" title="google icons">
+    # Google icons created by Freepik - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/search_281764?term=google&page=1&position=2&origin=search&related_id=281764
+    google_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(fp=join(base_path, "./assets/search.png")).resize(size=(80, 80))
+    )
+
+    mmtc_pamp_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(fp=join(base_path, "./assets/header-logo.png")).resize(
+            size=(80, 80)
+        )
+    )
+
+    Label(master=label_frame_3, image=google_ico, bg=THEME_COLOR["light"]).grid(
+        row=0, column=0, padx=5, pady=5
+    )
+    Label(master=label_frame_3, image=mmtc_pamp_ico, bg=THEME_COLOR["light"]).grid(
+        row=0, column=1, padx=5, pady=5
+    )
 
     progress_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
     progress_frame.pack(fill="x", pady=5)
