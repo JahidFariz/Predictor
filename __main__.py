@@ -6,6 +6,9 @@ Application Name: Predictor
 It is a supervised machine learning algorithm to predict the future data.
 """
 
+# TODO: Refresh button key bind
+# TODO: CLI title
+
 # pylint: disable=C0302
 
 
