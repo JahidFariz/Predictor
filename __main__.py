@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230324
+Version: 20230326
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -94,7 +94,6 @@ def loading_ui(value: int) -> None:
     rb1.config(state="disabled")
     rb2.config(state="disabled")
 
-    # This statement is used to disable the buttons on button frame if it is enabled.
     clear_button.config(state="disabled")
     refresh_button.config(state="disabled")
     exit_button.config(state="disabled")
@@ -112,16 +111,16 @@ def loading_ui(value: int) -> None:
     graph.grid(visible=True)
     canvas.draw()
 
+    tot_data_label.config(text="Loading...")
     min_val_label.config(text="Loading...")
     avg_val_label.config(text="Loading...")
     max_val_label.config(text="Loading...")
-    del_val_label.config(text="Loading...")
+    coef_label.config(text="Loading...")
+    intercept_label.config(text="Loading...")
     tomorrow_label.config(text="Loading...")
     next_week_label.config(text="Loading...")
     next_month_label.config(text="Loading...")
     next_year_label.config(text="Loading...")
-    coefficient_label.config(text="Loading...")
-    intercept_label.config(text="Loading...")
     status_label.config(text="Loading...")
     last_update_label.config(text="Loading...")
 
@@ -142,12 +141,10 @@ def predict_values(prediction_lst: list, total_records: int) -> None:
 
     for _ in tqdm(range(1, total_records + 1)):
         prediction_lst.append(float(model.predict(X=[[_]])))
-
         percentage: float = round(number=_ / total_records * 100, ndigits=2)
         progress_bar.config(value=percentage)
         percentage_label.config(text=f"{percentage}%")
-
-        app.update()
+        progress_bar.update()
 
 
 def draw_graph(x_axis, y_axis, prediction_lst: list) -> None:
@@ -182,7 +179,7 @@ def draw_graph(x_axis, y_axis, prediction_lst: list) -> None:
     app.update()
 
 
-def display_data(data, prediction_lst: list, total_records: int) -> None:
+def display_data(data, total_records: int) -> None:
     """
     This display_data function is used to display the data to the application.
     """
@@ -190,34 +187,33 @@ def display_data(data, prediction_lst: list, total_records: int) -> None:
     min_val: float = min(data["price"])
     avg_val: float = sum(data["price"]) / total_records
     max_val: float = max(data["price"])
-    del_val: float = (prediction_lst[-1] - prediction_lst[0]) / total_records
-    tomorrow_val: float = float(model.predict(X=[[total_records + 1]]))
-    next_week_val: float = float(model.predict(X=[[total_records + 7]]))
-    next_month_val: float = float(model.predict(X=[[total_records + 30.4375]]))
-    next_year_val: float = float(model.predict(X=[[total_records + 365.25]]))
     coef_val: float = float(model.coef_)
     intercept_val: float = float(model.intercept_)
+    tomorrow_val: float = coef_val * (total_records + 1) + intercept_val
+    next_week_val: float = coef_val * (total_records + 7) + intercept_val
+    next_month_val: float = coef_val * (total_records + 30.4375) + intercept_val
+    next_year_val: float = coef_val * (total_records + 365.25) + intercept_val
     last_update_val: str = list(data["date"])[-1]
 
+    tot_data_label.config(text=total_records)
     min_val_label.config(text=f"₹ {min_val}")
     max_val_label.config(text=f"₹ {max_val}")
-    coefficient_label.config(text=f"{coef_val}")
-    intercept_label.config(text=f"{intercept_val}")
 
-    if del_val < 0:
+    if coef_val < 0:
         status_label.config(text=f"BEAR {DOWN_ARROW}")
 
-    if del_val == 0:
+    if coef_val == 0:
         status_label.config(text="No Change")
 
-    if del_val > 0:
+    if coef_val > 0:
         status_label.config(text=f"BULL {UP_ARROW}")
 
     last_update_label.config(text=last_update_val)
 
     if choice.get() == 1:
         avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=4)}")
-        del_val_label.config(text=f"₹ {round(number=del_val, ndigits=4)}")
+        coef_label.config(text=round(number=coef_val, ndigits=4))
+        intercept_label.config(text=round(number=intercept_val, ndigits=4))
         tomorrow_label.config(text=f"₹ {round(number=tomorrow_val, ndigits=4)}")
         next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=4)}")
         next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=4)}")
@@ -228,7 +224,8 @@ def display_data(data, prediction_lst: list, total_records: int) -> None:
 
     if choice.get() == 2:
         avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=2)}")
-        del_val_label.config(text=f"₹ {round(number=del_val, ndigits=2)}")
+        coef_label.config(text=round(number=coef_val, ndigits=2))
+        intercept_label.config(text=round(number=intercept_val, ndigits=2))
         tomorrow_label.config(text=f"₹ {round(number=tomorrow_val, ndigits=2)}")
         next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=2)}")
         next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=2)}")
@@ -236,6 +233,8 @@ def display_data(data, prediction_lst: list, total_records: int) -> None:
         source_button.config(
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
+
+    app.update()
 
 
 def reset_ui():
@@ -255,7 +254,7 @@ def reset_ui():
     choice.set(value=0)
 
     clear_button.config(state="disabled")
-    refresh_button.config(state="disabled")
+    refresh_button.config(state="disabled", text="Refresh")
     exit_button.config(state="normal")
 
     for _ in ["<Right>", "<Left>"]:
@@ -271,16 +270,16 @@ def reset_ui():
     graph.grid(visible=True)
     canvas.draw()
 
+    tot_data_label.config(text="0")
     min_val_label.config(text="0.00")
     avg_val_label.config(text="0.00")
     max_val_label.config(text="0.00")
-    del_val_label.config(text="0.00")
+    coef_label.config(text="0.00")
+    intercept_label.config(text="0.00")
     tomorrow_label.config(text="0.00")
     next_week_label.config(text="0.00")
     next_month_label.config(text="0.00")
     next_year_label.config(text="0.00")
-    coefficient_label.config(text="0.00")
-    intercept_label.config(text="0.00")
     status_label.config(text="N/A")
     last_update_label.config(text="N/A")
 
@@ -328,7 +327,7 @@ def read_database(url: str) -> None:
         with urlopen(url, timeout=10) as response:
             data: read_csv = read_csv(filepath_or_buffer=response, encoding="utf-8")
             response.close()
-            update_ui(data)
+            update(data)
 
             return None
 
@@ -356,9 +355,9 @@ def read_database(url: str) -> None:
         return None
 
 
-def update_ui(data) -> None:
+def update(data) -> None:
     """
-    This update function is used to update the graph and data when the radio button is clicked.
+    This update function is used to predict, plot, and display the results
     """
 
     prediction_lst: list = []
@@ -373,6 +372,18 @@ def update_ui(data) -> None:
 
     model.fit(X=x_axis.values, y=y_axis)
 
+    predict_values(prediction_lst, total_records)
+    draw_graph(x_axis, y_axis, prediction_lst)
+    display_data(data, total_records)
+
+    update_ui()
+
+
+def update_ui() -> None:
+    """
+    This update function is used to update the graph and data when the radio button is clicked.
+    """
+
     for _ in [1, 4, 5, 7]:
         file_menu.entryconfig(index=_, state="normal")
 
@@ -382,7 +393,7 @@ def update_ui(data) -> None:
     rb2.config(state="normal")
 
     clear_button.config(state="normal")
-    refresh_button.config(state="normal")
+    refresh_button.config(state="normal", text="Refresh")
     exit_button.config(state="normal")
 
     clear_button.bind(sequence="<Right>", func=lambda event: refresh_button.focus())
@@ -393,10 +404,6 @@ def update_ui(data) -> None:
 
     exit_button.bind(sequence="<Right>", func=lambda event: clear_button.focus())
     exit_button.bind(sequence="<Left>", func=lambda event: refresh_button.focus())
-
-    predict_values(prediction_lst, total_records)
-    draw_graph(x_axis, y_axis, prediction_lst)
-    display_data(data, prediction_lst, total_records)
 
     source_button.config(text="Source", state="normal")
 
@@ -415,8 +422,8 @@ def refresh() -> None:
     This refresh function is used to refresh the graph and data.
     """
 
-    # refresh_button.config(text="Refreshing")
-    # app.update()
+    refresh_button.config(text="Refreshing", state="disabled")
+    refresh_button.update()
 
     if choice.get() == 1:
         print(
@@ -434,145 +441,187 @@ def refresh() -> None:
 
         e_gold_24k()
 
-    # refresh_button.config(text="Refresh")
-    # app.update()
-
 
 try:
+    print("=" * 80)
     print("[INFO]\tImporting libraries, Please wait...")
+
+    print("[INFO]\tImporting datetime, Please wait...")
     from datetime import datetime
+
+    print("[INFO]\tImporting getpass, Please wait...")
     from getpass import getuser
+
+    print("[INFO]\tImporting os, Please wait...")
     from os import system as terminal
     from os.path import isdir, join
+
+    print("[INFO]\tImporting pathlib, Please wait...")
     from pathlib import Path
+
+    print("[INFO]\tImporting platform, Please wait...")
     from platform import system as environment
+
+    print("[INFO]\tImporting random, Please wait...")
     from random import choice
+
+    print("[INFO]\tImporting shutil, Please wait...")
     from shutil import rmtree
+
+    print("[INFO]\tImporting sys, Please wait...")
     from sys import exit as terminate
+
+    print("[INFO]\tImporting tkinter, Please wait...")
     from tkinter import Button, Frame, IntVar, Label, LabelFrame, Menu
     from tkinter import PhotoImage as TkPhotoImage
     from tkinter import Radiobutton, TclError, Tk
     from tkinter.messagebox import askyesno, showerror
     from tkinter.ttk import Notebook, Progressbar
+
+    print("[INFO]\tImporting urllib, Please wait...")
     from urllib.error import URLError
     from urllib.request import urlopen
+
+    print("[INFO]\tImporting webbrowser, Please wait...")
     from webbrowser import open as browser
+
+    print("=" * 80)
 
     whoami: str = getuser()
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230324"
+    __version__: str = "v.20230326"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting colorama, Please wait...")
     from colorama import init
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting matplotlib, Please wait...")
     from matplotlib.backends.backend_tkagg import (
         FigureCanvasTkAgg,
         NavigationToolbar2Tk,
     )
     from matplotlib.figure import Figure
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting pandas, Please wait...")
     from pandas import read_csv
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting pillow, Please wait...")
     from PIL.Image import open as img_open
     from PIL.ImageTk import PhotoImage as PILPhotoImage
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting pyfiglet, Please wait...")
     from pyfiglet import FigletFont, figlet_format
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting scikit-learn, Please wait...")
     from sklearn.linear_model import LinearRegression
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting tqdm, Please wait...")
     from tqdm import tqdm
 
     selected_figlet_font: str = choice(FigletFont.getFonts())
 
+    print("=" * 80)
+
     print(f"[INFO]\t[{datetime.now()}]\tImporting constants module, Please wait...")
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting constants, Please wait...")
     from constants import (
-        ALBANIA,
-        ALGERIA,
-        ARGENTINA,
-        ARMENIA,
-        AUSTRIA,
-        AZERBAIJAN,
-        BAHRAIN,
-        BANGLADESH,
+        ALB,
+        ARG,
+        ARM,
+        AUT,
+        AZE,
         BEATING_HEART,
-        BELGIUM,
-        BOLIVIA,
-        BOSNIA_AND_HERZEGOVINA,
-        BRAZIL,
-        BULGARIA,
-        CAMBODIA,
-        CANADA,
-        COLOMBIA,
-        COSTA_RICA,
-        DENMARK,
-        DJIBOUTI,
-        DOMNIICAN_REPUBLIC,
+        BEL,
+        BGD,
+        BGR,
+        BHR,
+        BIH,
+        BOL,
+        BRA,
+        CAN,
+        CHE,
+        COL,
+        CRI,
+        DEU,
+        DJI,
+        DNK,
+        DOM,
         DOWN_ARROW,
-        ECUADOR,
-        EL_SALVADOR,
-        ESTONIA,
+        DZA,
+        ECU,
+        EST,
         F_BLUE,
         F_GREEN,
         F_RED,
         F_YELLOW,
-        FINLAND,
-        GEORGIA,
-        GERMANY,
-        GHANA,
-        GREECE,
-        GUATEMALA,
-        HONDURAS,
-        HUNGARY,
-        ICELAND,
-        INDIA,
-        INDONESIA,
-        ISRAEL,
-        ITALY,
-        JAMAICA,
-        JORDAN,
-        KAZAKHSTAN,
-        KENYA,
-        KUWAIT,
-        LATVIA,
-        LEBANON,
-        LITHUANIA,
-        MEXICO,
-        MOLDOVA,
+        FIN,
+        GEO,
+        GHA,
+        GRC,
+        GTM,
+        HND,
+        HUN,
+        IDN,
+        IND,
+        ISL,
+        ISR,
+        ITA,
+        JAM,
+        JOR,
+        KAZ,
+        KEN,
+        KHM,
+        KWT,
+        LBN,
+        LKA,
+        LTU,
+        LVA,
+        MDA,
+        MEX,
         MOUNTAIN,
-        NICARAGUA,
-        NIGERIA,
-        NORWAY,
-        OMAN,
-        PAKISTAN,
-        PANAMA,
-        PERU,
-        PHILIPPINES,
-        POLAND,
-        PORTUGAL,
-        QATAR,
+        NGA,
+        NIC,
+        NOR,
+        OMN,
+        PAK,
+        PAN,
+        PER,
+        PHL,
+        POL,
+        PRT,
+        QAT,
         S_BRIGHT,
         S_RESET_ALL,
-        SAUDI_ARABIA,
-        SENEGAL,
-        SERBIA,
-        SINGAPORE,
-        SLOVAKIA,
-        SLOVENIA,
-        SOUTH_AFRICA,
-        SRI_LANKA,
-        SWEDEN,
-        SWITZERLAND,
-        TANZANIA,
+        SAU,
+        SEN,
+        SGP,
+        SLV,
+        SRB,
+        SVK,
+        SVN,
+        SWE,
         THEME_COLOR,
-        TRINIDAD_AND_TOBAGO,
-        TUNISIA,
-        TURKEY,
-        UGANDA,
-        UKRAINE,
-        UNITED_ARAB_EMIRATES,
-        UNITED_STATE,
+        TTO,
+        TUN,
+        TUR,
+        TZA,
+        UAE,
+        UGA,
+        UKR,
         UP_ARROW,
-        URUGUAY,
-        UZBEKISTAN,
-        VENEZUELA,
-        VIETNAM,
+        URY,
+        USA,
+        UZB,
+        VEN,
+        VNM,
+        ZAF,
     )
+
+    print(F_BLUE + "=" * 80 + S_RESET_ALL)
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
@@ -788,11 +837,11 @@ try:
             special_day_banner(msg="New Year's Day")
 
         if day == 26:
-            special_day_banner(msg=f"India {INDIA} Republic Day")
+            special_day_banner(msg=f"India {IND} Republic Day")
 
     if month == 2:
         if day == 4:
-            special_day_banner(msg=f"Sri Lanka {SRI_LANKA} Independence Day")
+            special_day_banner(msg=f"Sri Lanka {LKA} Independence Day")
 
         if day == 6:
             special_day_banner(msg="Waitangi Day")
@@ -801,50 +850,48 @@ try:
             special_day_banner(msg=f"Valentine's Day {BEATING_HEART}")
 
         if day == 15:
-            special_day_banner(msg=f"Serbia {SERBIA} National Day")
+            special_day_banner(msg=f"Serbia {SRB} National Day")
 
         if day == 16:
-            special_day_banner(msg=f"Lithuania {LITHUANIA} Independence Day")
+            special_day_banner(msg=f"Lithuania {LTU} Independence Day")
 
         if day == 24:
-            special_day_banner(msg=f"Estonia {ESTONIA} Independence Day")
+            special_day_banner(msg=f"Estonia {EST} Independence Day")
 
         if day == 25:
-            special_day_banner(msg=f"Kuwait {KUWAIT} National Day")
+            special_day_banner(msg=f"Kuwait {KWT} National Day")
 
         if day == 27:
-            special_day_banner(
-                msg=f"Dominican Republic {DOMNIICAN_REPUBLIC} Independence Day"
-            )
+            special_day_banner(msg=f"Dominican Republic {DOM} Independence Day")
 
     if month == 3:
         if day == 1:
             special_day_banner(msg="St. David's Day")
 
         if day == 3:
-            special_day_banner(msg=f"Bulgaria {BULGARIA} Liberation Day")
+            special_day_banner(msg=f"Bulgaria {BGR} Liberation Day")
 
         if day == 6:
-            special_day_banner(msg=f"Ghana {GHANA} Independence Day")
+            special_day_banner(msg=f"Ghana {GHA} Independence Day")
 
         if day == 8:
             special_day_banner(msg="International Women's Day")
 
         if day == 15:
-            special_day_banner(msg=f"Hungary {HUNGARY} National Day")
+            special_day_banner(msg=f"Hungary {HUN} National Day")
 
         if day == 20:
-            special_day_banner(msg=f"Tunisia {TUNISIA} National Day")
+            special_day_banner(msg=f"Tunisia {TUN} National Day")
 
         if day == 25:
-            special_day_banner(msg=f"Greece {GREECE} National Day")
+            special_day_banner(msg=f"Greece {GRC} National Day")
 
         if day == 26:
-            special_day_banner(msg=f"Bangladesh {BANGLADESH} Independence Day")
+            special_day_banner(msg=f"Bangladesh {BGD} Independence Day")
 
     if month == 4:
         if day == 4:
-            special_day_banner(msg=f"Senegal {SENEGAL} Independence Day")
+            special_day_banner(msg=f"Senegal {SEN} Independence Day")
 
         if day == 22:
             special_day_banner(msg="Earth Day")
@@ -859,213 +906,211 @@ try:
         if day == 27:
             day_list: list = [
                 "King's Day",
-                f"South Africa {SOUTH_AFRICA} Freedom Day",
+                f"South Africa {ZAF} Freedom Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
     if day == 5:
         if day == 5:
-            special_day_banner(msg=f"Israel {ISRAEL} Independence Day")
+            special_day_banner(msg=f"Israel {ISR} Independence Day")
 
         if day == 17:
-            special_day_banner(msg=f"Norway {NORWAY} Constitution Day")
+            special_day_banner(msg=f"Norway {NOR} Constitution Day")
 
         if day == 25:
-            special_day_banner(msg=f"Jordan {JORDAN} Independence Day")
+            special_day_banner(msg=f"Jordan {JOR} Independence Day")
 
         if day == 26:
-            special_day_banner(msg=f"Georgia {GEORGIA} Independence Day")
+            special_day_banner(msg=f"Georgia {GEO} Independence Day")
 
     if month == 6:
         if day == 2:
-            special_day_banner(msg=f"Italy {ITALY} Republic Day")
+            special_day_banner(msg=f"Italy {ITA} Republic Day")
 
         if day == 5:
-            special_day_banner(msg=f"Denmark {DENMARK} Constitution Day")
+            special_day_banner(msg=f"Denmark {DNK} Constitution Day")
 
         if day == 6:
-            special_day_banner(msg=f"Sweden {SWEDEN} National Day")
+            special_day_banner(msg=f"Sweden {SWE} National Day")
 
         if day == 10:
-            special_day_banner(msg=f"Portugal {PORTUGAL} National Day")
+            special_day_banner(msg=f"Portugal {PRT} National Day")
 
         if day == 12:
-            special_day_banner(msg=f"Philippines {PHILIPPINES} Independence Day")
+            special_day_banner(msg=f"Philippines {PHL} Independence Day")
 
         if day == 17:
-            special_day_banner(msg=f"Iceland {ICELAND} National Day")
+            special_day_banner(msg=f"Iceland {ISL} National Day")
 
         if day == 25:
-            special_day_banner(msg=f"Slovenia {SLOVENIA} National Day")
+            special_day_banner(msg=f"Slovenia {SVN} National Day")
 
         if day == 27:
-            special_day_banner(msg=f"Djibouti {DJIBOUTI} Independence Day")
+            special_day_banner(msg=f"Djibouti {DJI} Independence Day")
 
     if month == 7:
         if day == 1:
-            special_day_banner(msg=f"Canada {CANADA} Day")
+            special_day_banner(msg=f"Canada {CAN} Day")
 
         if day == 4:
-            special_day_banner(msg=f"Fourth of July USA {UNITED_STATE}")
+            special_day_banner(msg=f"Fourth of July USA {USA}")
 
         if day == 5:
             day_list: list = [
-                f"Algeria {ALGERIA} Independence Day",
-                f"Venezuela {VENEZUELA} Independence Day",
+                f"Algeria {DZA} Independence Day",
+                f"Venezuela {VEN} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 9:
-            special_day_banner(msg=f"Argentina {ARGENTINA} Independence Day")
+            special_day_banner(msg=f"Argentina {ARG} Independence Day")
 
         if day == 14:
             special_day_banner(msg="Bastille Day")
 
         if day == 20:
-            special_day_banner(msg=f"Colombia {COLOMBIA} Independence Day")
+            special_day_banner(msg=f"Colombia {COL} Independence Day")
 
         if day == 21:
-            special_day_banner(msg=f"Belgium {BELGIUM} National Day")
+            special_day_banner(msg=f"Belgium {BEL} National Day")
 
         if day == 28:
-            special_day_banner(msg=f"Peru {PERU} Independence Day")
+            special_day_banner(msg=f"Peru {PER} Independence Day")
 
     if month == 8:
         if day == 1:
-            special_day_banner(msg=f"Switzerland {SWITZERLAND} National Day")
+            special_day_banner(msg=f"Switzerland {CHE} National Day")
 
         if day == 6:
             day_list: list = [
-                f"Bolivia {BOLIVIA} Independence Day",
-                f"Jamaica {JAMAICA} Independence Day",
+                f"Bolivia {BOL} Independence Day",
+                f"Jamaica {JAM} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 9:
-            special_day_banner(msg=f"Singapore {SINGAPORE} National Day")
+            special_day_banner(msg=f"Singapore {SGP} National Day")
 
         if day == 10:
-            special_day_banner(msg=f"Ecuador {ECUADOR} Independence Day")
+            special_day_banner(msg=f"Ecuador {ECU} Independence Day")
 
         if day == 11:
             special_day_banner(msg=f"Mountain {MOUNTAIN} Day")
 
         if day == 14:
-            special_day_banner(msg=f"Pakistan {PAKISTAN} Independence Day")
+            special_day_banner(msg=f"Pakistan {PAK} Independence Day")
 
         if day == 15:
             day_list: list = [
                 "National Liberation Day of Korea",
-                f"India {INDIA} Independence Day",
+                f"India {IND} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 17:
-            special_day_banner(msg=f"Indonesia {INDONESIA} Independence Day")
+            special_day_banner(msg=f"Indonesia {IDN} Independence Day")
 
         if day == 24:
-            special_day_banner(msg=f"Ukraine {UKRAINE} Independence Day")
+            special_day_banner(msg=f"Ukraine {UKR} Independence Day")
 
         if day == 25:
-            special_day_banner(msg=f"Uruguay {URUGUAY} Independence Day")
+            special_day_banner(msg=f"Uruguay {URY} Independence Day")
 
         if day == 27:
-            special_day_banner(msg=f"Republic of Moldova {MOLDOVA} Independence Day")
+            special_day_banner(msg=f"Republic of Moldova {MDA} Independence Day")
 
         if day == 31:
             day_list: list = [
                 "Hari Merdeka",
-                f"Trinidad & Tobago {TRINIDAD_AND_TOBAGO} Independence Day",
+                f"Trinidad & Tobago {TTO} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
     if month == 9:
         if day == 1:
-            special_day_banner(msg=f"Uzbekistan {UZBEKISTAN} Independence Day")
+            special_day_banner(msg=f"Uzbekistan {UZB} Independence Day")
 
         if day == 2:
-            special_day_banner(msg=f"Vietnam {VIETNAM} National Day")
+            special_day_banner(msg=f"Vietnam {VNM} National Day")
 
         if day == 7:
-            special_day_banner(msg=f"Brazil {BRAZIL} Independence Day")
+            special_day_banner(msg=f"Brazil {BRA} Independence Day")
 
         if day == 15:
             day_list: list = [
-                f"Costa Rica {COSTA_RICA} Independence Day",
-                f"El Salvador {EL_SALVADOR} Independence Day",
-                f"Guatemala {GUATEMALA} Independence Day",
-                f"Honduras {HONDURAS} National Day",
-                f"Nicaragua {NICARAGUA} Independence Day",
+                f"Costa Rica {CRI} Independence Day",
+                f"El Salvador {SLV} Independence Day",
+                f"Guatemala {GTM} Independence Day",
+                f"Honduras {HND} National Day",
+                f"Nicaragua {NIC} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 16:
-            special_day_banner(msg=f"Mexico {MEXICO} Independence Day")
+            special_day_banner(msg=f"Mexico {MEX} Independence Day")
 
         if day == 19:
             special_day_banner(msg="Respect for the Aged Day")
 
         if day == 21:
-            special_day_banner(msg=f"Armenia {ARMENIA} Independence Day")
+            special_day_banner(msg=f"Armenia {ARM} Independence Day")
 
         if day == 23:
-            special_day_banner(msg=f"Saudi Arabia {SAUDI_ARABIA} National Day")
+            special_day_banner(msg=f"Saudi Arabia {SAU} National Day")
 
     if month == 10:
         if day == 1:
-            special_day_banner(msg=f"Nigeria {NIGERIA} Independence Day")
+            special_day_banner(msg=f"Nigeria {NGA} Independence Day")
 
         if day == 3:
-            special_day_banner(msg=f"German {GERMANY} Unity Day")
+            special_day_banner(msg=f"German {DEU} Unity Day")
 
         if day == 9:
-            day_list: list = ["Hangul Day", f"Uganda {UGANDA} Independence Day"]
+            day_list: list = ["Hangul Day", f"Uganda {UGA} Independence Day"]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 18:
-            special_day_banner(msg=f"Azerbaijan {AZERBAIJAN} Independence Day")
+            special_day_banner(msg=f"Azerbaijan {AZE} Independence Day")
 
         if day == 26:
-            special_day_banner(msg=f"Austria {AUSTRIA} National Day")
+            special_day_banner(msg=f"Austria {AUT} National Day")
 
         if day == 29:
-            special_day_banner(msg=f"Turkey {TURKEY} National Day")
+            special_day_banner(msg=f"Turkey {TUR} National Day")
 
     if month == 11:
         if day == 3:
-            special_day_banner(msg=f"Panama {PANAMA} Independence Day")
+            special_day_banner(msg=f"Panama {PAN} Independence Day")
 
         if day == 9:
-            special_day_banner(msg=f"Cambodia {CAMBODIA} Independence Day")
+            special_day_banner(msg=f"Cambodia {KHM} Independence Day")
 
         if day == 11:
-            day_list: list = [f"Poland {POLAND} National Day", "Veterans Day"]
+            day_list: list = [f"Poland {POL} National Day", "Veterans Day"]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 17:
             day_list: list = [
                 "Czech Republic Freedom and Democracy Day",
-                f"Slovakia {SLOVAKIA} Freedom and Democracy Day",
+                f"Slovakia {SVK} Freedom and Democracy Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 18:
             day_list: list = [
-                f"Oman {OMAN} National Day",
-                f"Latvia {LATVIA} Independence Day",
+                f"Oman {OMN} National Day",
+                f"Latvia {LVA} Independence Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 22:
-            special_day_banner(msg=f"Lebanon {LEBANON} Independence Day")
+            special_day_banner(msg=f"Lebanon {LBN} Independence Day")
 
         if day == 25:
-            special_day_banner(
-                msg=f"Bosnia & Herzegovina {BOSNIA_AND_HERZEGOVINA} Statehood Day"
-            )
+            special_day_banner(msg=f"Bosnia & Herzegovina {BIH} Statehood Day")
 
         if day == 28:
-            special_day_banner(msg=f"Albania {ALBANIA} Independence Day")
+            special_day_banner(msg=f"Albania {ALB} Independence Day")
 
         if day == 30:
             special_day_banner(msg="St. Andrew's Day")
@@ -1075,26 +1120,26 @@ try:
             special_day_banner(msg="Great Union Day")
 
         if day == 2:
-            special_day_banner(msg=f"UAE {UNITED_ARAB_EMIRATES} National Day")
+            special_day_banner(msg=f"UAE {UAE} National Day")
 
         if day == 6:
-            special_day_banner(msg=f"Finland {FINLAND} Independence Day")
+            special_day_banner(msg=f"Finland {FIN} Independence Day")
 
         if day == 9:
-            special_day_banner(msg=f"Tanzania {TANZANIA} Independence Day")
+            special_day_banner(msg=f"Tanzania {TZA} Independence Day")
 
         if day == 12:
-            special_day_banner(msg=f"Kenya {KENYA} Independence Day")
+            special_day_banner(msg=f"Kenya {KEN} Independence Day")
 
         if day == 16:
             day_list: list = [
-                f"Kazakhstan {KAZAKHSTAN} Independence Day",
-                f"Bahrain {BAHRAIN} National Day",
+                f"Kazakhstan {KAZ} Independence Day",
+                f"Bahrain {BHR} National Day",
             ]
             special_day_banner(msg=choice(seq=day_list))
 
         if day == 18:
-            special_day_banner(msg=f"Qatar {QATAR} National Day")
+            special_day_banner(msg=f"Qatar {QAT} National Day")
 
         if day == 31:
             special_day_banner(msg="New Year's Eve")
@@ -1148,6 +1193,7 @@ try:
         bg="orange",
         fg="#FFF",
         activeforeground="#FFF",
+        activebackground="#ffbe00",
         compound="left",
         state="disabled",
         image=clear_icon,
@@ -1167,6 +1213,7 @@ try:
         bg="green",
         fg="#FFF",
         activeforeground="#FFF",
+        activebackground="#009a00",
         image=refresh_ico,
         compound="left",
         state="disabled",
@@ -1229,93 +1276,93 @@ try:
     )
     label_frame_2.pack(padx=10, pady=5, fill="both")
 
-    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Minimum:").grid(
+    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Total Records:").grid(
         row=0, column=0, padx=10, sticky="w"
+    )
+    tot_data_label: Label = Label(
+        master=label_frame_2, bg=THEME_COLOR["light"], text="0"
+    )
+    tot_data_label.grid(row=0, column=1, padx=10, sticky="w")
+
+    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Minimum:").grid(
+        row=1, column=0, padx=10, sticky="w"
     )
     min_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    min_val_label.grid(row=0, column=1, padx=10, sticky="w")
+    min_val_label.grid(row=1, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Average:").grid(
-        row=1, column=0, padx=10, sticky="w"
+        row=2, column=0, padx=10, sticky="w"
     )
     avg_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    avg_val_label.grid(row=1, column=1, padx=10, sticky="w")
+    avg_val_label.grid(row=2, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Maximum:").grid(
-        row=2, column=0, padx=10, sticky="w"
+        row=3, column=0, padx=10, sticky="w"
     )
     max_val_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    max_val_label.grid(row=2, column=1, padx=10, sticky="w")
+    max_val_label.grid(row=3, column=1, padx=10, sticky="w")
 
-    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Delta:").grid(
-        row=3, column=0, padx=10, sticky="w"
+    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Coefficient (m):").grid(
+        row=4, column=0, padx=10, sticky="w"
     )
-    del_val_label: Label = Label(
+    coef_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
     )
-    del_val_label.grid(row=3, column=1, padx=10, sticky="w")
+    coef_label.grid(row=4, column=1, padx=10, sticky="w")
+
+    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Intercept (b):").grid(
+        row=5, column=0, padx=10, sticky="w"
+    )
+    intercept_label: Label = Label(
+        master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
+    )
+    intercept_label.grid(row=5, column=1, padx=10, sticky="w")
 
     Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="Tomorrow expected:"
-    ).grid(row=4, column=0, padx=10, sticky="w")
+    ).grid(row=6, column=0, padx=10, sticky="w")
     tomorrow_label: Label = Label(
         master=label_frame_2,
         bg=THEME_COLOR["light"],
         text="0.00",
     )
-    tomorrow_label.grid(row=4, column=1, padx=10, sticky="w")
+    tomorrow_label.grid(row=6, column=1, padx=10, sticky="w")
 
     Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="Next week expected:"
-    ).grid(row=5, column=0, padx=10, sticky="w")
+    ).grid(row=7, column=0, padx=10, sticky="w")
     next_week_label: Label = Label(
         master=label_frame_2,
         bg=THEME_COLOR["light"],
         text="0.00",
     )
-    next_week_label.grid(row=5, column=1, padx=10, sticky="w")
+    next_week_label.grid(row=7, column=1, padx=10, sticky="w")
 
     Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="Next month expected:"
-    ).grid(row=6, column=0, padx=10, sticky="w")
+    ).grid(row=8, column=0, padx=10, sticky="w")
     next_month_label: Label = Label(
         master=label_frame_2,
         bg=THEME_COLOR["light"],
         text="0.00",
     )
-    next_month_label.grid(row=6, column=1, padx=10, sticky="w")
+    next_month_label.grid(row=8, column=1, padx=10, sticky="w")
 
     Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="Next year expected:"
-    ).grid(row=7, column=0, padx=10, sticky="w")
+    ).grid(row=9, column=0, padx=10, sticky="w")
     next_year_label: Label = Label(
         master=label_frame_2,
         bg=THEME_COLOR["light"],
         text="0.00",
     )
-    next_year_label.grid(row=7, column=1, padx=10, sticky="w")
-
-    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Coefficient:").grid(
-        row=8, column=0, padx=10, sticky="w"
-    )
-    coefficient_label: Label = Label(
-        master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
-    )
-    coefficient_label.grid(row=8, column=1, padx=10, sticky="w")
-
-    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Intercept:").grid(
-        row=9, column=0, padx=10, sticky="w"
-    )
-    intercept_label: Label = Label(
-        master=label_frame_2, bg=THEME_COLOR["light"], text="0.00"
-    )
-    intercept_label.grid(row=9, column=1, padx=10, sticky="w")
+    next_year_label.grid(row=9, column=1, padx=10, sticky="w")
 
     Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Status:").grid(
         row=10, column=0, padx=10, sticky="w"
@@ -1349,15 +1396,12 @@ try:
         image=redirect_icon,
         width=80,
     )
-    source_button.grid(row=13, column=0, padx=10, pady=5, sticky="w")
+    source_button.grid(row=12, column=0, padx=10, pady=5, sticky="w")
 
     label_frame_3: LabelFrame = LabelFrame(
         master=data_frame, text="Powered by", bg=THEME_COLOR["light"], fg="red"
     )
     label_frame_3.pack(padx=10, pady=5, fill="both", expand=True)
-
-    # new_frame: Frame = Frame(master=data_frame, bg=THEME_COLOR["light"])
-    # new_frame.pack()
 
     # <a href="https://www.flaticon.com/free-icons/google" title="google icons">
     # Google icons created by Freepik - Flaticon
@@ -1397,19 +1441,21 @@ try:
     )
     percentage_label.pack(padx=(5, 10), side="left")
 
+    footer_msg: str = (
+        f"Created by FOSS Kingdom / "
+        f"Made with Love {BEATING_HEART} in Incredible India {IND}"
+    )
+
     footer_label: Label = Label(
         master=app,
-        text=f"Created by FOSS Kingdom / Made with Love {BEATING_HEART} in Incredible India "
-        "{INDIA}.",
+        text=footer_msg,
         bg="#000",
         fg="#FFF",
     )
     footer_label.pack(side="bottom", fill="x")
 
-    print(
-        f"{F_GREEN}{S_BRIGHT}Created by FOSS Kingdom / Made with Love {BEATING_HEART} in "
-        f"Incredible India {INDIA}."
-    )
+    print(f"{F_GREEN}{S_BRIGHT}{footer_msg}")
+    print(F_BLUE + "=" * 80)
 
     app.mainloop()
 
@@ -1436,12 +1482,12 @@ except ModuleNotFoundError as module_not_found_error:
     clrscr()
 
     print("=" * 80)
-
     print("Error Code: builtins.ModuleNotFoundError")
     print(
         f"[ERROR]\t[{datetime.now()}]\tSorry, an error occurred! {module_not_found_error}"
     )
 
     print("=" * 80)
-
     print("Bye!!")
+
+    terminate()
