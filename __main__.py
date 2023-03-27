@@ -6,8 +6,8 @@ Application Name: Predictor
 It is a supervised machine learning algorithm to predict the future data.
 """
 
-# TODO: Refresh button key bind
-# TODO: CLI title
+# Refresh button key bind
+# CLI title
 
 # pylint: disable=C0302
 
@@ -87,6 +87,9 @@ def loading_ui(value: int) -> None:
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Loading please wait..."
     )
+
+    for _ in ["<Control-R>", "<Control-r>"]:
+        app.unbind(sequence=_)
 
     for _ in [1, 4, 5, 7]:
         file_menu.entryconfig(index=_, state="disabled")
@@ -245,6 +248,9 @@ def reset_ui():
     This reset_ui function is used to reset the user interface
     """
 
+    for _ in ["<Control-R>", "<Control-r>"]:
+        app.unbind(sequence=_)
+
     file_menu.entryconfig(index=1, state="normal")
     file_menu.entryconfig(index=4, state="disabled")
     file_menu.entryconfig(index=5, state="disabled")
@@ -386,6 +392,9 @@ def update_ui() -> None:
     """
     This update function is used to update the graph and data when the radio button is clicked.
     """
+
+    for _ in ["<Control-R>", "<Control-r>"]:
+        app.bind(sequence=_, func=lambda event: refresh())
 
     for _ in [1, 4, 5, 7]:
         file_menu.entryconfig(index=_, state="normal")
@@ -1279,9 +1288,9 @@ try:
     )
     label_frame_2.pack(padx=10, pady=5, fill="both")
 
-    Label(master=label_frame_2, bg=THEME_COLOR["light"], text="Total Records:").grid(
-        row=0, column=0, padx=10, sticky="w"
-    )
+    Label(
+        master=label_frame_2, bg=THEME_COLOR["light"], text="Total Records (n):"
+    ).grid(row=0, column=0, padx=10, sticky="w")
     tot_data_label: Label = Label(
         master=label_frame_2, bg=THEME_COLOR["light"], text="0"
     )
