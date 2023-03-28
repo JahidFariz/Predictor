@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230326
+Version: 20230328
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -132,6 +132,10 @@ def loading_ui(value: int) -> None:
 
     source_button.config(text="Loading...", state="disabled")
 
+    text_box.config(state="normal")
+    text_box.delete(index1=1.0, index2="end")
+    text_box.config(state="disabled")
+
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
 
@@ -224,9 +228,12 @@ def display_data(data, total_records: int) -> None:
         next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=4)}")
         next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=4)}")
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=4)}")
+
         source_button.config(
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
+
+        content: str = "No information available..."
 
     if choice.get() == 2:
         avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=2)}")
@@ -236,9 +243,20 @@ def display_data(data, total_records: int) -> None:
         next_week_label.config(text=f"₹ {round(number=next_week_val, ndigits=2)}")
         next_month_label.config(text=f"₹ {round(number=next_month_val, ndigits=2)}")
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=2)}")
+
         source_button.config(
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
+
+        with open(
+            file=join(base_path, "./docs/24k_e-Gold.txt"), mode="r", encoding="utf-8"
+        ) as file:
+            content: str = file.read()
+            file.close()
+
+    text_box.config(state="normal")
+    text_box.insert(index=1.0, chars=content)
+    text_box.config(state="disabled")
 
     app.update()
 
@@ -488,6 +506,7 @@ try:
     from tkinter import PhotoImage as TkPhotoImage
     from tkinter import Radiobutton, TclError, Tk
     from tkinter.messagebox import askyesno, showerror
+    from tkinter.scrolledtext import ScrolledText
     from tkinter.ttk import Notebook, Progressbar
 
     print("[INFO]\tImporting urllib, Please wait...")
@@ -503,7 +522,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230326"
+    __version__: str = "v.20230328"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
@@ -680,7 +699,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/money_2704332?term=dollar&page=1&position=8&origin=search&related_id=2704332
     money_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/money.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/money.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/gold" title="gold icons">
@@ -688,7 +707,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/ingots_1473504?term=gold&page=1&position=1&origin=search&related_id=1473504
     gold_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/ingots.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/ingots.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/profit" title="profit icons">
@@ -696,7 +715,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/bar-chart_893214?term=graph&page=1&position=48&origin=search&related_id=893214
     graph_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/statistics" title="statistics icons">
@@ -704,7 +723,15 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/statistics_2920349?term=data&page=1&position=6&origin=search&related_id=2920349
     statistic_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/statistics.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/statistics.png")).resize(size=(16, 16))
+    )
+
+    # <a href="https://www.flaticon.com/free-icons/information" title="information icons">
+    # Information icons created by Freepik - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/information_2538026?term=information&page=1&position=8&origin=search&related_id=2538026
+    info_ico: PILPhotoImage = PILPhotoImage(
+        img_open(fp=join(base_path, "./assets/information.png")).resize(size=(16, 16))
     )
 
     # File Menu
@@ -739,12 +766,14 @@ try:
     )
     file_menu.add_separator()
     file_menu.add_command(label="Clear", state="disabled", command=reset_ui)
-    file_menu.add_command(label="Refresh", state="disabled", command=refresh)
+    file_menu.add_command(
+        label="Refresh", accelerator="(Ctrl+R)", state="disabled", command=refresh
+    )
     file_menu.add_separator()
     file_menu.add_command(label="Exit", accelerator="(Ctrl+Q)", command=exit_app)
 
     license_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/license.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/license.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">
@@ -752,16 +781,16 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/play_2377793?term=video&page=1&position=46&origin=search&related_id=2377793
     video_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/play.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/play.png")).resize(size=(16, 16))
     )
 
     source_code_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/programming.png")).resize(
-            size=(20, 20)
+            size=(16, 16)
         )
     )
     issues_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/bug-report.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/bug-report.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/translate" title="translate icons">
@@ -769,7 +798,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/translate_9628122?term=translation&page=1&position=22&origin=search&related_id=9628122
     translation_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/translate.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/translate.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/notepad" title="notepad icons">
@@ -777,11 +806,11 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/notepad_686234?term=notepad&page=1&position=1&origin=search&related_id=686234
     changelog_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/notepad.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/notepad.png")).resize(size=(16, 16))
     )
 
     website_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/web-link.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/web-link.png")).resize(size=(16, 16))
     )
 
     # <a href="https://www.flaticon.com/free-icons/email" title="email icons">
@@ -789,7 +818,7 @@ try:
     # </a>
     # https://www.flaticon.com/free-icon/mail_9068642?term=email&page=1&position=25&origin=search&related_id=9068642
     email_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/mail.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/mail.png")).resize(size=(16, 16))
     )
 
     # Links Menu
@@ -809,7 +838,7 @@ try:
     links_menu.add_command(label="E-Mail Author", image=email_ico, compound="left")
 
     donation_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(join(base_path, "./assets/donation.png")).resize(size=(20, 20))
+        image=img_open(join(base_path, "./assets/donation.png")).resize(size=(16, 16))
     )
 
     # Help Menu
@@ -818,6 +847,8 @@ try:
     help_menu.add_command(
         label="About Predictor",
         accelerator="(\u2139\ufe0f)",
+        image=info_ico,
+        compound="left",
         command=lambda: browser(url="https://github.com/JahidFariz/Predictor#readme"),
     )
     help_menu.add_separator()
@@ -1263,11 +1294,16 @@ try:
     data_frame: Frame = Frame(master=tab_view, bg=THEME_COLOR["light"])
     data_frame.pack()
 
+    info_frame: Frame = Frame(master=tab_view, bg=THEME_COLOR["light"])
+    info_frame.pack()
+
     tab_view.add(child=graph_frame, text="Graph", image=graph_ico, compound="left")
     tab_view.add(child=data_frame, text="Data", image=statistic_ico, compound="left")
+    tab_view.add(child=info_frame, text="Info", image=info_ico, compound="left")
 
     app.bind(sequence="<Alt-KeyPress-1>", func=lambda event: tab_view.select(tab_id=0))
     app.bind(sequence="<Alt-KeyPress-2>", func=lambda event: tab_view.select(tab_id=1))
+    app.bind(sequence="<Alt-KeyPress-3>", func=lambda event: tab_view.select(tab_id=2))
 
     fig: Figure = Figure(facecolor=THEME_COLOR["light"])
     fig.suptitle(t="Graph Area")
@@ -1435,6 +1471,11 @@ try:
     Label(master=label_frame_3, image=mmtc_pamp_ico, bg=THEME_COLOR["light"]).grid(
         row=0, column=1, padx=5, pady=5
     )
+
+    text_box: ScrolledText = ScrolledText(
+        master=info_frame, wrap="word", state="disabled"
+    )
+    text_box.pack(fill="both", expand=True)
 
     progress_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
     progress_frame.pack(fill="x", pady=5)
