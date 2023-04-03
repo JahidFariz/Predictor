@@ -9,8 +9,8 @@ echo;
 apt list --upgradable -a;
 echo;
 
-echo "> sudo apt install python3;";
-sudo apt install python3;
+echo "> sudo apt install python3 xtitle -y;";
+sudo apt install python3 xtitle -y;
 echo;
 
 echo "> sudo apt autoremove;";

@@ -6,7 +6,6 @@ Application Name: Predictor
 It is a supervised machine learning algorithm to predict the future data.
 """
 
-# Refresh button key bind
 # CLI title
 
 # pylint: disable=C0302
@@ -51,6 +50,25 @@ def clrscr() -> None:
 
     if uname == "Windows":
         terminal(command="cls")
+
+
+def set_title() -> None:
+    """
+    This set_title function is used to set the title name in CLI console.
+    """
+
+    if uname == "Linux":
+        stat: int = terminal(command=f"xtitle Predictor {__version__}")
+
+        if stat == 32512:
+            # sh: 1: xtitle: not found
+            # 32512
+
+            print(f"{F_RED}{S_BRIGHT}Use the following command to install xtitle:")
+            print(f"{F_BLUE}{S_BRIGHT}sudo apt update && sudo apt install xtitle -y")
+
+    if uname == "Windows":
+        terminal(command="title Predictor")
 
 
 def clear_cache() -> None:
@@ -233,7 +251,11 @@ def display_data(data, total_records: int) -> None:
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
 
-        content: str = "No information available..."
+        with open(
+            file=join(base_path, "./docs/USD_2_INR.txt"), mode="r", encoding="utf-8"
+        ) as file:
+            content: str = file.read()
+            file.close()
 
     if choice.get() == 2:
         avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=2)}")
@@ -522,7 +544,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = environment()
-    __version__: str = "v.20230328"
+    __version__: str = "v.20230404"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
@@ -676,7 +698,10 @@ try:
     print(F_BLUE + "=" * 80)
 
     app: Tk = Tk()
+
     app.title(string=f"Predictor {__version__}")
+    set_title()
+
     x_axis_resolution: int = app.winfo_screenwidth()
     y_axis_resolution: int = app.winfo_screenheight()
     app.maxsize(width=x_axis_resolution, height=y_axis_resolution)
