@@ -4,6 +4,13 @@ This constants file is used to store constant variables only.
 
 THEME_COLOR: dict = {"light": "#BCD2EE"}
 
+USD2INR: str = (
+    "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
+)
+E_GOLD: str = (
+    "https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
+)
+
 F_GREEN: str = "\x1b[32m"
 F_BLUE: str = "\x1b[34m"
 F_RED: str = "\x1b[31m"

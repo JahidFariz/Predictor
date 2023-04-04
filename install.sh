@@ -13,8 +13,8 @@ echo "> sudo apt install python3 xtitle -y;";
 sudo apt install python3 xtitle -y;
 echo;
 
-echo "> sudo apt autoremove;";
-sudo apt autoremove;
+echo "> sudo apt autoremove -y;";
+sudo apt autoremove -y;
 echo;
 
 if [ -f "./requirements.txt" ]; then

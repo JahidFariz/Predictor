@@ -45,10 +45,10 @@ def clrscr() -> None:
     This clear_screen function is used to clear the console screen
     """
 
-    if uname == "Linux":
+    if uname == "posix":
         terminal(command="clear")
 
-    if uname == "Windows":
+    if uname == "nt":
         terminal(command="cls")
 
 
@@ -57,7 +57,7 @@ def set_title() -> None:
     This set_title function is used to set the title name in CLI console.
     """
 
-    if uname == "Linux":
+    if uname == "posix":
         stat: int = terminal(command=f"xtitle Predictor {__version__}")
 
         if stat == 32512:
@@ -67,7 +67,7 @@ def set_title() -> None:
             print(f"{F_RED}{S_BRIGHT}Use the following command to install xtitle:")
             print(f"{F_BLUE}{S_BRIGHT}sudo apt update && sudo apt install xtitle -y")
 
-    if uname == "Windows":
+    if uname == "nt":
         terminal(command="title Predictor")
 
 
@@ -120,11 +120,13 @@ def loading_ui(value: int) -> None:
 
     clear_button.config(state="disabled")
     refresh_button.config(state="disabled")
+    download_button.config(state="disabled")
     exit_button.config(state="disabled")
 
     for _ in ["<Right>", "<Left>"]:
         clear_button.unbind(sequence=_)
         refresh_button.unbind(sequence=_)
+        download_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
     fig.suptitle(t="Loading...")
@@ -304,11 +306,13 @@ def reset_ui():
 
     clear_button.config(state="disabled")
     refresh_button.config(state="disabled", text="Refresh")
+    download_button.config(state="disabled")
     exit_button.config(state="normal")
 
     for _ in ["<Right>", "<Left>"]:
         clear_button.unbind(sequence=_)
         refresh_button.unbind(sequence=_)
+        download_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
     fig.suptitle(t="Graph Area")
@@ -347,9 +351,7 @@ def usd_to_inr() -> None:
     """
 
     loading_ui(value=1)
-    read_database(
-        url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/USD2INR.csv"
-    )
+    read_database(url=USD2INR)
 
 
 def e_gold_24k() -> None:
@@ -358,9 +360,7 @@ def e_gold_24k() -> None:
     """
 
     loading_ui(value=2)
-    read_database(
-        url="https://raw.githubusercontent.com/JahidFariz/ML-Training-Data/main/e-Gold.csv"
-    )
+    read_database(url=E_GOLD)
 
 
 def read_database(url: str) -> None:
@@ -446,16 +446,20 @@ def update_ui() -> None:
 
     clear_button.config(state="normal")
     refresh_button.config(state="normal", text="Refresh")
+    download_button.config(state="normal")
     exit_button.config(state="normal")
 
     clear_button.bind(sequence="<Right>", func=lambda event: refresh_button.focus())
     clear_button.bind(sequence="<Left>", func=lambda event: exit_button.focus())
 
-    refresh_button.bind(sequence="<Right>", func=lambda event: exit_button.focus())
+    refresh_button.bind(sequence="<Right>", func=lambda event: download_button.focus())
     refresh_button.bind(sequence="<Left>", func=lambda event: clear_button.focus())
 
+    download_button.bind(sequence="<Right>", func=lambda event: exit_button.focus())
+    download_button.bind(sequence="<Left>", func=lambda event: refresh_button.focus())
+
     exit_button.bind(sequence="<Right>", func=lambda event: clear_button.focus())
-    exit_button.bind(sequence="<Left>", func=lambda event: refresh_button.focus())
+    exit_button.bind(sequence="<Left>", func=lambda event: download_button.focus())
 
     source_button.config(text="Source", state="normal")
 
@@ -494,6 +498,35 @@ def refresh() -> None:
         e_gold_24k()
 
 
+def download_csv() -> None:
+    """
+    This download_csv function is used to download the CSV model.
+    """
+
+    app.withdraw()
+    file_location: str = asksaveasfilename(
+        filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+        defaultextension=".csv",
+    )
+    app.deiconify()
+
+    try:
+        if file_location and choice.get() == 1:
+            with open(file=file_location, mode="w", encoding="utf-8") as file:
+                file.write(
+                    get(url=USD2INR, timeout=10).content.decode(encoding="utf-8")
+                )
+                file.close()
+
+        if file_location and choice.get() == 2:
+            with open(file=file_location, mode="w", encoding="utf-8") as file:
+                file.write(get(url=E_GOLD, timeout=10).content.decode(encoding="utf-8"))
+                file.close()
+
+    except RequestsConnectionError as requests_connection_error:
+        print(requests_connection_error)
+
+
 try:
     print("=" * 80)
     print("[INFO]\tImporting libraries, Please wait...")
@@ -505,14 +538,12 @@ try:
     from getpass import getuser
 
     print("[INFO]\tImporting os, Please wait...")
+    from os import name
     from os import system as terminal
     from os.path import isdir, join
 
     print("[INFO]\tImporting pathlib, Please wait...")
     from pathlib import Path
-
-    print("[INFO]\tImporting platform, Please wait...")
-    from platform import system as environment
 
     print("[INFO]\tImporting random, Please wait...")
     from random import choice
@@ -527,6 +558,7 @@ try:
     from tkinter import Button, Frame, IntVar, Label, LabelFrame, Menu
     from tkinter import PhotoImage as TkPhotoImage
     from tkinter import Radiobutton, TclError, Tk
+    from tkinter.filedialog import asksaveasfilename
     from tkinter.messagebox import askyesno, showerror
     from tkinter.scrolledtext import ScrolledText
     from tkinter.ttk import Notebook, Progressbar
@@ -543,7 +575,7 @@ try:
     whoami: str = getuser()
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
-    uname: str = environment()
+    uname: str = name
     __version__: str = "v.20230404"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
@@ -567,6 +599,10 @@ try:
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting pyfiglet, Please wait...")
     from pyfiglet import FigletFont, figlet_format
+
+    print(f"[INFO]\t[{datetime.now()}]\tImporting requests, Please wait...")
+    from requests import get
+    from requests.exceptions import ConnectionError as RequestsConnectionError
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting scikit-learn, Please wait...")
     from sklearn.linear_model import LinearRegression
@@ -605,6 +641,7 @@ try:
         DOM,
         DOWN_ARROW,
         DZA,
+        E_GOLD,
         ECU,
         EST,
         F_BLUE,
@@ -668,6 +705,7 @@ try:
         UP_ARROW,
         URY,
         USA,
+        USD2INR,
         UZB,
         VEN,
         VNM,
@@ -1258,14 +1296,14 @@ try:
     clear_button: Button = Button(
         master=buttons_frame,
         text="Clear",
-        bg="orange",
+        bg="#3333ff",
         fg="#FFF",
         activeforeground="#FFF",
-        activebackground="#ffbe00",
+        activebackground="blue",
         compound="left",
         state="disabled",
         image=clear_icon,
-        width=90,
+        width=110,
         command=reset_ui,
     )
     clear_button.bind(sequence="<Return>", func=lambda event: reset_ui())
@@ -1285,11 +1323,37 @@ try:
         image=refresh_ico,
         compound="left",
         state="disabled",
-        width=90,
+        width=110,
         command=refresh,
     )
     refresh_button.bind(sequence="<Return>", func=lambda event: refresh())
     refresh_button.pack(padx=5, side="left")
+
+    # <a href="https://www.flaticon.com/free-icons/direct-download" title="direct download icons">
+    # Direct download icons created by Pixel perfect - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/direct-download_2810390?k=1680621808785&log-in=google
+    download_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(join(base_path, "./assets/direct-download.png")).resize(
+            size=(16, 16)
+        )
+    )
+
+    download_button: Button = Button(
+        master=buttons_frame,
+        text="Download CSV",
+        bg="orange",
+        fg="#FFF",
+        activeforeground="#FFF",
+        activebackground="#ffbe00",
+        image=download_ico,
+        compound="left",
+        state="disabled",
+        width=110,
+        command=download_csv,
+    )
+    download_button.bind(sequence="<Return>", func=lambda event: download_csv())
+    download_button.pack(padx=5, side="left")
 
     exit_icon: PILPhotoImage = PILPhotoImage(
         image=img_open(fp=join(base_path, "./assets/logout.png")).resize(size=(16, 16))
@@ -1300,7 +1364,7 @@ try:
         text="Exit",
         bg="#CE313A",
         fg="#FFF",
-        width=90,
+        width=110,
         activebackground="red",
         activeforeground="#FFF",
         image=exit_icon,
