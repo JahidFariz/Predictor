@@ -503,28 +503,47 @@ def download_csv() -> None:
     This download_csv function is used to download the CSV model.
     """
 
-    app.withdraw()
-    file_location: str = asksaveasfilename(
-        filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
-        defaultextension=".csv",
-    )
-    app.deiconify()
-
     try:
-        if file_location and choice.get() == 1:
+        if choice.get() == 1:
+            content: str = get(url=USD2INR, timeout=10).content.decode(encoding="utf-8")
+
+        if choice.get() == 2:
+            content: str = get(url=E_GOLD, timeout=10).content.decode(encoding="utf-8")
+
+        app.withdraw()
+        file_location: str = asksaveasfilename(
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+            defaultextension=".csv",
+        )
+        app.deiconify()
+
+        if file_location:
             with open(file=file_location, mode="w", encoding="utf-8") as file:
-                file.write(
-                    get(url=USD2INR, timeout=10).content.decode(encoding="utf-8")
-                )
+                file.write(content)
                 file.close()
 
-        if file_location and choice.get() == 2:
-            with open(file=file_location, mode="w", encoding="utf-8") as file:
-                file.write(get(url=E_GOLD, timeout=10).content.decode(encoding="utf-8"))
-                file.close()
+        return None
 
     except RequestsConnectionError as requests_connection_error:
-        print(requests_connection_error)
+        print(F_BLUE + "=" * 80)
+        figlet_banner(font=selected_figlet_font)
+        print(F_BLUE + "=" * 80)
+        print(f"{S_BRIGHT}Failed to download CSV file...")
+        print(f"{S_BRIGHT}Error Code: requests.exceptions.ConnectionError")
+        print(
+            f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+            f"{S_RESET_ALL}]\t{S_BRIGHT}{requests_connection_error}"
+        )
+        print(F_BLUE + "=" * 80)
+
+        app.withdraw()
+        showerror(
+            title="Predictor",
+            message=f"Failed to download CSV file...\n{str(requests_connection_error)}",
+        )
+        app.deiconify()
+
+        return None
 
 
 try:
