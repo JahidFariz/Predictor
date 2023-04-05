@@ -1,6 +1,6 @@
 """
 Author: Mohamed Fariz
-Version: 20230328
+Version: 20230405
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
@@ -595,7 +595,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = name
-    __version__: str = "v.20230404"
+    __version__: str = "v.20230405"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
