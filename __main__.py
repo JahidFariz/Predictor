@@ -588,12 +588,19 @@ def download_csv() -> None:
             filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
             defaultextension=".csv",
         )
-        app.deiconify()
 
         if file_location:
             with open(file=file_location, mode="w", encoding="utf-8") as file:
                 file.write(content)
                 file.close()
+
+                print(
+                    f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+                    f"{S_RESET_ALL}]\t{S_BRIGHT}File saved successfully..."
+                )
+                showinfo(title="Predictor", message="File saved successfully...")
+
+        app.deiconify()
 
     except RequestsConnectionError as requests_connection_error:
         print(F_BLUE + "=" * 80)
@@ -653,6 +660,7 @@ try:
     from tkinter.messagebox import askyesno, showerror
     from tkinter.scrolledtext import ScrolledText
     from tkinter.ttk import Notebook, Progressbar
+    from tkinter.messagebox import showinfo
 
     print("[INFO]\tImporting urllib, Please wait...")
     from urllib.error import URLError
