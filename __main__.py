@@ -1,12 +1,10 @@
 """
 Author: Mohamed Fariz
-Version: 20230405
+Version: 20230406
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
 """
-
-# CLI title
 
 # pylint: disable=C0302
 
@@ -103,16 +101,22 @@ def loading_ui(value: int) -> None:
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
-        f"{S_RESET_ALL}]\t{S_BRIGHT}Loading please wait..."
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Loading, Please wait..."
     )
 
-    for _ in ["<Control-R>", "<Control-r>"]:
+    for _ in ["<Control-R>", "<Control-r>", "<Control-S>", "<Control-s>"]:
         app.unbind(sequence=_)
 
-    for _ in [1, 4, 5, 7]:
+    # 1 = Predict
+    # 4 = Clear
+    # 5 = Refresh
+    # 6 = Download CSV
+    # 8 = Exit
+
+    for _ in [1, 4, 5, 6, 8]:
         file_menu.entryconfig(index=_, state="disabled")
 
-    header_label.config(text="Loading please wait...")
+    header_label.config(text="Loading, Please wait...")
 
     choice.set(value)
     rb1.config(state="disabled")
@@ -151,15 +155,21 @@ def loading_ui(value: int) -> None:
     last_update_label.config(text="Loading...")
 
     source_button.config(text="Loading...", state="disabled")
+    google_play_button.config(text="Loading...", state="disabled")
+
+    for _ in ["<Left>", "<Right>"]:
+        source_button.unbind(sequence=_)
+        google_play_button.unbind(sequence=_)
 
     text_box.config(state="normal")
     text_box.delete(index1=1.0, index2="end")
+    text_box.insert(index=1.0, chars="Loading, Please wait...")
     text_box.config(state="disabled")
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
 
-    footer_label.config(text="Loading please wait...")
+    footer_label.config(text="Loading, Please wait...")
 
     app.update()
 
@@ -250,14 +260,15 @@ def display_data(data, total_records: int) -> None:
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=4)}")
 
         source_button.config(
+            text="Source",
+            state="normal",
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
+        google_play_button.config(text="Google Play", state="disabled")
 
-        with open(
-            file=join(base_path, "./docs/USD_2_INR.txt"), mode="r", encoding="utf-8"
-        ) as file:
-            content: str = file.read()
-            file.close()
+        for _ in ["<Left>", "<Right>"]:
+            source_button.unbind(sequence=_)
+            google_play_button.unbind(sequence=_)
 
     if choice.get() == 2:
         avg_val_label.config(text=f"₹ {round(number=avg_val, ndigits=2)}")
@@ -269,9 +280,42 @@ def display_data(data, total_records: int) -> None:
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=2)}")
 
         source_button.config(
+            text="Source",
+            state="normal",
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
+        google_play_button.config(
+            text="Google Play",
+            state="normal",
+            command=lambda: browser(
+                url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"
+            ),
+        )
 
+        for _ in ["<Left>", "<Right>"]:
+            source_button.bind(
+                sequence=_, func=lambda event: google_play_button.focus()
+            )
+            google_play_button.bind(
+                sequence=_, func=lambda event: source_button.focus()
+            )
+
+    app.update()
+
+
+def display_info() -> None:
+    """
+    This display_info function is used to display the information on the text widget.
+    """
+
+    if choice.get() == 1:
+        with open(
+            file=join(base_path, "./docs/USD_2_INR.txt"), mode="r", encoding="utf-8"
+        ) as file:
+            content: str = file.read()
+            file.close()
+
+    if choice.get() == 2:
         with open(
             file=join(base_path, "./docs/24k_e-Gold.txt"), mode="r", encoding="utf-8"
         ) as file:
@@ -279,6 +323,7 @@ def display_data(data, total_records: int) -> None:
             file.close()
 
     text_box.config(state="normal")
+    text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars=content)
     text_box.config(state="disabled")
 
@@ -290,13 +335,20 @@ def reset_ui():
     This reset_ui function is used to reset the user interface
     """
 
-    for _ in ["<Control-R>", "<Control-r>"]:
+    for _ in ["<Control-R>", "<Control-r>", "<Control-S>", "<Control-s>"]:
         app.unbind(sequence=_)
+
+    # 1 = Predict
+    # 4 = Clear
+    # 5 = Refresh
+    # 6 = Download CSV
+    # 8 = Exit
 
     file_menu.entryconfig(index=1, state="normal")
     file_menu.entryconfig(index=4, state="disabled")
     file_menu.entryconfig(index=5, state="disabled")
-    file_menu.entryconfig(index=7, state="normal")
+    file_menu.entryconfig(index=6, state="disabled")
+    file_menu.entryconfig(index=8, state="normal")
 
     header_label.config(text=f"Hello {whoami.title()}, Welcome to Predictor")
 
@@ -337,6 +389,16 @@ def reset_ui():
     last_update_label.config(text="N/A")
 
     source_button.config(text="Source", state="disabled")
+    google_play_button.config(text="Google Play", state="disabled")
+
+    for _ in ["<Left>", "<Right>"]:
+        source_button.unbind(sequence=_)
+        google_play_button.unbind(sequence=_)
+
+    text_box.config(state="normal")
+    text_box.delete(index1=1.0, index2="end")
+    text_box.insert(index=1.0, chars="No information available...")
+    text_box.config(state="disabled")
 
     footer_label.config(
         text="Created by FOSS KINGDOM, Made with Love in Incredible India."
@@ -424,6 +486,7 @@ def update(data) -> None:
     predict_values(prediction_lst, total_records)
     draw_graph(x_axis, y_axis, prediction_lst)
     display_data(data, total_records)
+    display_info()
 
     update_ui()
 
@@ -436,7 +499,16 @@ def update_ui() -> None:
     for _ in ["<Control-R>", "<Control-r>"]:
         app.bind(sequence=_, func=lambda event: refresh())
 
-    for _ in [1, 4, 5, 7]:
+    for _ in ["<Control-S>", "<Control-s>"]:
+        app.bind(sequence=_, func=lambda event: download_csv())
+
+    # 1 = Predict
+    # 4 = Clear
+    # 5 = Refresh
+    # 6 = Download CSV
+    # 8 = Exit
+
+    for _ in [1, 4, 5, 6, 8]:
         file_menu.entryconfig(index=_, state="normal")
 
     header_label.config(text=f"Hello {whoami.title()}, Welcome to Predictor")
@@ -461,8 +533,6 @@ def update_ui() -> None:
     exit_button.bind(sequence="<Right>", func=lambda event: clear_button.focus())
     exit_button.bind(sequence="<Left>", func=lambda event: download_button.focus())
 
-    source_button.config(text="Source", state="normal")
-
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
 
@@ -478,7 +548,7 @@ def refresh() -> None:
     This refresh function is used to refresh the graph and data.
     """
 
-    refresh_button.config(text="Refreshing", state="disabled")
+    refresh_button.config(text="Refreshing...", state="disabled")
     refresh_button.update()
 
     if choice.get() == 1:
@@ -503,6 +573,9 @@ def download_csv() -> None:
     This download_csv function is used to download the CSV model.
     """
 
+    download_button.config(state="disabled", text="Downloading...")
+    download_button.update()
+
     try:
         if choice.get() == 1:
             content: str = get(url=USD2INR, timeout=10).content.decode(encoding="utf-8")
@@ -522,8 +595,6 @@ def download_csv() -> None:
                 file.write(content)
                 file.close()
 
-        return None
-
     except RequestsConnectionError as requests_connection_error:
         print(F_BLUE + "=" * 80)
         figlet_banner(font=selected_figlet_font)
@@ -539,16 +610,17 @@ def download_csv() -> None:
         app.withdraw()
         showerror(
             title="Predictor",
-            message=f"Failed to download CSV file...\n{str(requests_connection_error)}",
+            message=f"Failed to download CSV file...\n\n{str(requests_connection_error)}",
         )
         app.deiconify()
 
-        return None
+    download_button.config(state="normal", text="Download CSV")
+    download_button.update()
 
 
 try:
     print("=" * 80)
-    print("[INFO]\tImporting libraries, Please wait...")
+    print("[INFO]\tImporting built-in libraries, Please wait...")
 
     print("[INFO]\tImporting datetime, Please wait...")
     from datetime import datetime
@@ -595,7 +667,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = name
-    __version__: str = "v.20230405"
+    __version__: str = "v.20230406"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
@@ -850,6 +922,12 @@ try:
     file_menu.add_command(label="Clear", state="disabled", command=reset_ui)
     file_menu.add_command(
         label="Refresh", accelerator="(Ctrl+R)", state="disabled", command=refresh
+    )
+    file_menu.add_command(
+        label="Download CSV",
+        accelerator="(Ctrl+S)",
+        state="disabled",
+        command=download_csv,
     )
     file_menu.add_separator()
     file_menu.add_command(label="Exit", accelerator="(Ctrl+Q)", command=exit_app)
@@ -1305,20 +1383,20 @@ try:
     rb2.bind(sequence="<Down>", func=lambda event: rb1.focus())
     rb2.grid(row=1, column=0, sticky="w")
 
-    buttons_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
-    buttons_frame.pack(pady=5)
+    buttons_frame_1: Frame = Frame(master=app, bg=THEME_COLOR["light"])
+    buttons_frame_1.pack(pady=5)
 
     clear_icon: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/clear.png")).resize(size=(16, 16))
     )
 
     clear_button: Button = Button(
-        master=buttons_frame,
+        master=buttons_frame_1,
         text="Clear",
         bg="#3333ff",
         fg="#FFF",
         activeforeground="#FFF",
-        activebackground="blue",
+        activebackground="#00f",
         compound="left",
         state="disabled",
         image=clear_icon,
@@ -1333,7 +1411,7 @@ try:
     )
 
     refresh_button: Button = Button(
-        master=buttons_frame,
+        master=buttons_frame_1,
         text="Refresh",
         bg="green",
         fg="#FFF",
@@ -1359,7 +1437,7 @@ try:
     )
 
     download_button: Button = Button(
-        master=buttons_frame,
+        master=buttons_frame_1,
         text="Download CSV",
         bg="orange",
         fg="#FFF",
@@ -1379,7 +1457,7 @@ try:
     )
 
     exit_button: Button = Button(
-        master=buttons_frame,
+        master=buttons_frame_1,
         text="Exit",
         bg="#CE313A",
         fg="#FFF",
@@ -1391,7 +1469,7 @@ try:
         command=exit_app,
     )
     exit_button.bind(sequence="<Return>", func=lambda event: exit_app())
-    exit_button.pack(padx=(5, 5), side="left")
+    exit_button.pack(padx=5, side="left")
 
     tab_view: Notebook = Notebook(master=app)
     tab_view.pack(fill="both", expand=True)
@@ -1536,12 +1614,15 @@ try:
     )
     last_update_label.grid(row=11, column=1, padx=10, sticky="w")
 
-    redirect_icon: PILPhotoImage = PILPhotoImage(
-        image=img_open(fp=join(base_path, "./assets/share.png")).resize(size=(15, 15))
+    buttons_frame_2: Frame = Frame(master=data_frame, bg=THEME_COLOR["light"])
+    buttons_frame_2.pack(pady=5)
+
+    redirect_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(fp=join(base_path, "./assets/share.png")).resize(size=(14, 14))
     )
 
     source_button: Button = Button(
-        master=label_frame_2,
+        master=buttons_frame_2,
         text="Source",
         bg="#CE313A",
         fg="#FFF",
@@ -1549,10 +1630,31 @@ try:
         activeforeground="#FFF",
         state="disabled",
         compound="right",
-        image=redirect_icon,
-        width=80,
+        image=redirect_ico,
+        width=100,
     )
-    source_button.grid(row=12, column=0, padx=10, pady=5, sticky="w")
+    source_button.pack(padx=5, side="left")
+
+    # <a href="https://www.flaticon.com/free-icons/google-play" title="google play icons">
+    # Google play icons created by Pixel perfect - Flaticon
+    # </a>
+    # https://www.flaticon.com/free-icon/google-play_888857?term=google+play&page=1&position=11&origin=search&related_id=888857
+    google_play_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(join(base_path, "./assets/google-play.png")).resize((16, 16))
+    )
+
+    google_play_button: Button = Button(
+        master=buttons_frame_2,
+        text="Google Play",
+        bg="#00f",
+        fg="#fff",
+        activeforeground="#fff",
+        state="disabled",
+        compound="left",
+        width=100,
+        image=google_play_ico,
+    )
+    google_play_button.pack(padx=5, side="left")
 
     label_frame_3: LabelFrame = LabelFrame(
         master=data_frame, text="Powered by", bg=THEME_COLOR["light"], fg="red"
@@ -1580,9 +1682,9 @@ try:
         row=0, column=1, padx=5, pady=5
     )
 
-    text_box: ScrolledText = ScrolledText(
-        master=info_frame, wrap="word", state="disabled"
-    )
+    text_box: ScrolledText = ScrolledText(master=info_frame, wrap="word")
+    text_box.insert(index=1.0, chars="No information available...")
+    text_box.config(state="disabled")
     text_box.pack(fill="both", expand=True)
 
     progress_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])

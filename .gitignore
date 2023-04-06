@@ -4,5 +4,6 @@ venv/
 dist/
 .idea/
 __pycache__/
+.vscode/
 *.swp
 *.spec
