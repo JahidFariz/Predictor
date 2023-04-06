@@ -657,10 +657,9 @@ try:
     from tkinter import PhotoImage as TkPhotoImage
     from tkinter import Radiobutton, TclError, Tk
     from tkinter.filedialog import asksaveasfilename
-    from tkinter.messagebox import askyesno, showerror
+    from tkinter.messagebox import askyesno, showerror, showinfo
     from tkinter.scrolledtext import ScrolledText
     from tkinter.ttk import Notebook, Progressbar
-    from tkinter.messagebox import showinfo
 
     print("[INFO]\tImporting urllib, Please wait...")
     from urllib.error import URLError
