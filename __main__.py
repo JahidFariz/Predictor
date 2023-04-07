@@ -25,6 +25,8 @@ def exit_app() -> None:
     This exit_app function used to exit the tkinter application
     """
 
+    music.stop()
+
     app.withdraw()
 
     if askyesno(title="Predictor", message="Are you sure do you really want to quit?"):
@@ -99,6 +101,8 @@ def loading_ui(value: int) -> None:
     This loading_ui function is used to load the user interface.
     """
 
+    music.stop()
+
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Loading, Please wait..."
@@ -165,6 +169,7 @@ def loading_ui(value: int) -> None:
     text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars="Loading, Please wait...")
     text_box.config(state="disabled")
+    text_box.unbind(sequence="<Button-3>")
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -326,6 +331,10 @@ def display_info() -> None:
     text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars=content)
     text_box.config(state="disabled")
+    text_box.bind(
+        sequence="<Button-3>",
+        func=lambda event: popup_menu.tk_popup(x=event.x_root, y=event.y_root),
+    )
 
     app.update()
 
@@ -334,6 +343,8 @@ def reset_ui():
     """
     This reset_ui function is used to reset the user interface
     """
+
+    music.stop()
 
     for _ in ["<Control-R>", "<Control-r>", "<Control-S>", "<Control-s>"]:
         app.unbind(sequence=_)
@@ -399,6 +410,7 @@ def reset_ui():
     text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars="No information available...")
     text_box.config(state="disabled")
+    text_box.unbind(sequence="<Button-3>")
 
     footer_label.config(
         text="Created by FOSS KINGDOM, Made with Love in Incredible India."
@@ -456,6 +468,8 @@ def read_database(url: str) -> None:
             f"{S_RESET_ALL}]\t{S_BRIGHT}{url_error}"
         )
         print(F_BLUE + "=" * 80)
+
+        play(path=join(base_path, "./mp3/error-call-to-attention-129258.mp3"))
 
         app.withdraw()
         showerror(
@@ -596,9 +610,11 @@ def download_csv() -> None:
 
                 print(
                     f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
-                    f"{S_RESET_ALL}]\t{S_BRIGHT}File saved successfully..."
+                    f"{S_RESET_ALL}]\t{S_BRIGHT}CSV file downloaded successfully..."
                 )
-                showinfo(title="Predictor", message="File saved successfully...")
+                showinfo(
+                    title="Predictor", message="CSV file downloaded successfully..."
+                )
 
         app.deiconify()
 
@@ -614,6 +630,8 @@ def download_csv() -> None:
         )
         print(F_BLUE + "=" * 80)
 
+        play(path=join(base_path, "./mp3/error-call-to-attention-129258.mp3"))
+
         app.withdraw()
         showerror(
             title="Predictor",
@@ -623,6 +641,54 @@ def download_csv() -> None:
 
     download_button.config(state="normal", text="Download CSV")
     download_button.update()
+
+
+def copy_to_clipboard() -> None:
+    """
+    This copy_to_clipboard function is used to copy the text from the textbox widget
+    """
+
+    app.clipboard_clear()
+
+    try:
+        app.clipboard_append(string=text_box.selection_get())
+
+    except TclError:
+        app.clipboard_append(string=text_box.get(index1=1.0, index2="end"))
+
+    app.withdraw()
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Successfully, copied to clipboard!!"
+    )
+    showinfo(title="Predictor", message="Successfully, copied to clipboard!!")
+    app.deiconify()
+
+
+def play(path: str) -> None:
+    """
+    This play function is used to play the sounds and music
+    """
+
+    music.load(filename=path)
+    music.play(loops=0)
+
+
+def read_aloud() -> None:
+    """
+    This read_aloud function is used to read the text using TTS engines.
+    """
+
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Reading the text..."
+    )
+
+    if choice.get() == 1:
+        play(path=join(base_path, "./mp3/USD_2_INR.mp3"))
+
+    if choice.get() == 2:
+        play(path=join(base_path, "./mp3/24k_e-Gold.mp3"))
 
 
 try:
@@ -679,7 +745,7 @@ try:
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting colorama, Please wait...")
-    from colorama import init
+    from colorama import init as colorama_init
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting matplotlib, Please wait...")
     from matplotlib.backends.backend_tkagg import (
@@ -697,6 +763,11 @@ try:
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting pyfiglet, Please wait...")
     from pyfiglet import FigletFont, figlet_format
+
+    # https://www.youtube.com/watch?v=djDcVWbEYoE
+    print(f"[INFO]\t[{datetime.now()}]\tImporting pygame, Please wait...")
+    from pygame.mixer import init as pygame_init
+    from pygame.mixer import music
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting requests, Please wait...")
     from requests import get
@@ -816,13 +887,19 @@ try:
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Initializing colorama, Please wait...{S_RESET_ALL}"
     )
-    init(autoreset=True)
+    colorama_init(autoreset=True)
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
         f"{S_RESET_ALL}]\t{S_BRIGHT}Initializing linear regression model, Please wait..."
     )
     model: LinearRegression = LinearRegression()
+
+    print(
+        f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
+        f"{S_RESET_ALL}]\t{S_BRIGHT}Initializing pygame.mixer, Please wait..."
+    )
+    pygame_init()
 
     print(
         f"[{F_GREEN}{S_BRIGHT}INFO{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}"
@@ -1694,6 +1771,13 @@ try:
     text_box.config(state="disabled")
     text_box.pack(fill="both", expand=True)
 
+    # https://www.youtube.com/watch?v=KRuUtNxOb_k&t=466s
+    popup_menu: Menu = Menu(master=text_box, tearoff=False)
+    popup_menu.add_command(label="Copy", command=copy_to_clipboard)
+    popup_menu.add_command(label="Read Aloud", command=read_aloud)
+    popup_menu.add_separator()
+    popup_menu.add_command(label="Select All")
+
     progress_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
     progress_frame.pack(fill="x", pady=5)
 
@@ -1733,30 +1817,24 @@ except TclError as tcl_error:
     clrscr()
 
     print(F_BLUE + "=" * 80)
-
-    figlet_banner(font="standard")
-
+    figlet_banner(font=selected_figlet_font)
     print(F_BLUE + "=" * 80)
-
     print(S_BRIGHT + "Error Code: tkinter.TclError")
     print(
         f"[{F_RED}{S_BRIGHT}ERROR{S_RESET_ALL}]\t[{F_BLUE}{S_BRIGHT}{datetime.now()}{S_RESET_ALL}]"
-        f"\t{S_BRIGHT}Sorry, an error occurred! {tcl_error}"
+        f"\t{S_BRIGHT}{tcl_error}"
     )
-
     print(F_BLUE + "=" * 80)
-
     print(F_GREEN + S_BRIGHT + "Bye!!")
+
+    terminate()
 
 except ModuleNotFoundError as module_not_found_error:
     clrscr()
 
     print("=" * 80)
     print("Error Code: builtins.ModuleNotFoundError")
-    print(
-        f"[ERROR]\t[{datetime.now()}]\tSorry, an error occurred! {module_not_found_error}"
-    )
-
+    print(f"[ERROR]\t[{datetime.now()}]\t{module_not_found_error}")
     print("=" * 80)
     print("Bye!!")
 
