@@ -1,9 +1,97 @@
 """
+
 Author: Mohamed Fariz
-Version: 20230406
+Version: 20230408
 Application Name: Predictor
 
 It is a supervised machine learning algorithm to predict the future data.
+
+
+Sound Effect by
+<a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&amp; \
+    utm_medium=referral&amp; \
+    utm_campaign=music&amp; \
+    utm_content=129258">
+UNIVERSFIELD
+</a>
+from
+<a href="https://pixabay.com//?utm_source=link-attribution&amp; \
+    utm_medium=referral&amp; \
+    utm_campaign=music&amp; \
+    utm_content=129258">
+Pixabay
+</a>
+
+
+a href="https://www.flaticon.com/free-icons/money" title="money icons">
+Money icons created by vectorsmarket15 - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/gold" title="gold icons">
+Gold icons created by photo3idea_studio - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/profit" title="profit icons">
+Profit icons created by Pixel perfect - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/statistics" title="statistics icons">
+Statistics icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/information" title="information icons">
+Information icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">
+Play button icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/translate" title="translate icons">
+Translate icons created by icon wind - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/notepad" title="notepad icons">
+Notepad icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/email" title="email icons">
+Email icons created by Fathema Khanom - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/direct-download" title="direct download icons">
+Direct download icons created by Pixel perfect - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/google-play" title="google play icons">
+Google play icons created by Pixel perfect - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/google" title="google icons">
+Google icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/copy" title="copy icons">
+Copy icons created by Freepik - Flaticon
+</a>
+
+
+<a href="https://www.flaticon.com/free-icons/speaker" title="speaker icons">
+Speaker icons created by Freepik - Flaticon
+</a>
+
 """
 
 # pylint: disable=C0302
@@ -158,10 +246,10 @@ def loading_ui(value: int) -> None:
     status_label.config(text="Loading...")
     last_update_label.config(text="Loading...")
 
-    source_button.config(text="Loading...", state="disabled")
-    google_play_button.config(text="Loading...", state="disabled")
+    source_button.config(state="disabled")
+    google_play_button.config(state="disabled")
 
-    for _ in ["<Left>", "<Right>"]:
+    for _ in ["<Left>", "<Right>", "<Return>"]:
         source_button.unbind(sequence=_)
         google_play_button.unbind(sequence=_)
 
@@ -169,7 +257,16 @@ def loading_ui(value: int) -> None:
     text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars="Loading, Please wait...")
     text_box.config(state="disabled")
-    text_box.unbind(sequence="<Button-3>")
+
+    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
+        text_box.unbind(_)
+
+    copy_button.config(state="disabled")
+    read_aloud_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        copy_button.unbind(sequence=_)
+        read_aloud_button.unbind(sequence=_)
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -265,11 +362,11 @@ def display_data(data, total_records: int) -> None:
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=4)}")
 
         source_button.config(
-            text="Source",
             state="normal",
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
-        google_play_button.config(text="Google Play", state="disabled")
+        source_button.bind(sequence="<Return>", func=lambda event: browser(url="https://www.google.com/finance/quote/USD-INR"))
+        google_play_button.config(state="disabled")
 
         for _ in ["<Left>", "<Right>"]:
             source_button.unbind(sequence=_)
@@ -285,17 +382,17 @@ def display_data(data, total_records: int) -> None:
         next_year_label.config(text=f"₹ {round(number=next_year_val, ndigits=2)}")
 
         source_button.config(
-            text="Source",
             state="normal",
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
+        source_button.bind(sequence="<Return>", func=lambda event: browser(url="https://www.mmtcpamp.com/"))
         google_play_button.config(
-            text="Google Play",
             state="normal",
             command=lambda: browser(
                 url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"
             ),
         )
+        google_play_button.bind(sequence="<Return>", func=lambda event: browser(url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"))
 
         for _ in ["<Left>", "<Right>"]:
             source_button.bind(
@@ -335,6 +432,19 @@ def display_info() -> None:
         sequence="<Button-3>",
         func=lambda event: popup_menu.tk_popup(x=event.x_root, y=event.y_root),
     )
+
+    for _ in ["<Control-C>", "<Control-c>"]:
+        text_box.bind(sequence=_, func=lambda event: copy_to_clipboard())
+
+    copy_button.config(state="normal")
+    read_aloud_button.config(state="normal")
+
+    copy_button.bind(sequence="<Return>", func=lambda event: copy_to_clipboard())
+    read_aloud_button.bind(sequence="<Return>", func=lambda event: read_aloud())
+
+    for _ in ["<Left>", "<Right>"]:
+        copy_button.bind(sequence=_, func=lambda event: read_aloud_button.focus())
+        read_aloud_button.bind(sequence=_, func=lambda event: copy_button.focus())
 
     app.update()
 
@@ -399,10 +509,10 @@ def reset_ui():
     status_label.config(text="N/A")
     last_update_label.config(text="N/A")
 
-    source_button.config(text="Source", state="disabled")
-    google_play_button.config(text="Google Play", state="disabled")
+    source_button.config(state="disabled")
+    google_play_button.config(state="disabled")
 
-    for _ in ["<Left>", "<Right>"]:
+    for _ in ["<Left>", "<Right>", "<Return>"]:
         source_button.unbind(sequence=_)
         google_play_button.unbind(sequence=_)
 
@@ -410,7 +520,16 @@ def reset_ui():
     text_box.delete(index1=1.0, index2="end")
     text_box.insert(index=1.0, chars="No information available...")
     text_box.config(state="disabled")
-    text_box.unbind(sequence="<Button-3>")
+
+    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
+        text_box.unbind(sequence=_)
+
+    copy_button.config(state="disabled")
+    read_aloud_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        copy_button.unbind(sequence=_)
+        read_aloud_button.unbind(sequence=_)
 
     footer_label.config(
         text="Created by FOSS KINGDOM, Made with Love in Incredible India."
@@ -740,7 +859,7 @@ try:
     today: datetime = datetime.today()
     base_path: Path = Path(__file__).parent
     uname: str = name
-    __version__: str = "v.20230406"
+    __version__: str = "v.20230408"
 
     print(f"[INFO]\t[{datetime.now()}]\tImporting third-party modules, Please wait...")
 
@@ -932,42 +1051,22 @@ try:
 
     app.config(bg=THEME_COLOR["light"], menu=menu_bar)
 
-    # <a href="https://www.flaticon.com/free-icons/money" title="money icons">
-    # Money icons created by vectorsmarket15 - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/money_2704332?term=dollar&page=1&position=8&origin=search&related_id=2704332
     money_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/money.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/gold" title="gold icons">
-    # Gold icons created by photo3idea_studio - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/ingots_1473504?term=gold&page=1&position=1&origin=search&related_id=1473504
     gold_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/ingots.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/profit" title="profit icons">
-    # Profit icons created by Pixel perfect - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/bar-chart_893214?term=graph&page=1&position=48&origin=search&related_id=893214
     graph_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/bar-chart.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/statistics" title="statistics icons">
-    # Statistics icons created by Freepik - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/statistics_2920349?term=data&page=1&position=6&origin=search&related_id=2920349
     statistic_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/statistics.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/information" title="information icons">
-    # Information icons created by Freepik - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/information_2538026?term=information&page=1&position=8&origin=search&related_id=2538026
     info_ico: PILPhotoImage = PILPhotoImage(
         img_open(fp=join(base_path, "./assets/information.png")).resize(size=(16, 16))
     )
@@ -1020,10 +1119,6 @@ try:
         image=img_open(join(base_path, "./assets/license.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">
-    # Play button icons created by Freepik - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/play_2377793?term=video&page=1&position=46&origin=search&related_id=2377793
     video_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/play.png")).resize(size=(16, 16))
     )
@@ -1037,18 +1132,10 @@ try:
         image=img_open(join(base_path, "./assets/bug-report.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/translate" title="translate icons">
-    # Translate icons created by icon wind - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/translate_9628122?term=translation&page=1&position=22&origin=search&related_id=9628122
     translation_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/translate.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/notepad" title="notepad icons">
-    # Notepad icons created by Freepik - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/notepad_686234?term=notepad&page=1&position=1&origin=search&related_id=686234
     changelog_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/notepad.png")).resize(size=(16, 16))
     )
@@ -1057,10 +1144,6 @@ try:
         image=img_open(join(base_path, "./assets/web-link.png")).resize(size=(16, 16))
     )
 
-    # <a href="https://www.flaticon.com/free-icons/email" title="email icons">
-    # Email icons created by Fathema Khanom - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/mail_9068642?term=email&page=1&position=25&origin=search&related_id=9068642
     email_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/mail.png")).resize(size=(16, 16))
     )
@@ -1118,7 +1201,6 @@ try:
     day: int = today.day
 
     # https://carpedm20.github.io/emoji/
-
     if month == 1:
         if day == 1:
             special_day_banner(msg="New Year's Day")
@@ -1477,10 +1559,10 @@ try:
     clear_button: Button = Button(
         master=buttons_frame_1,
         text="Clear",
-        bg="#3333ff",
+        bg="#00f",
         fg="#FFF",
         activeforeground="#FFF",
-        activebackground="#00f",
+        activebackground="#3333ff",
         compound="left",
         state="disabled",
         image=clear_icon,
@@ -1510,10 +1592,6 @@ try:
     refresh_button.bind(sequence="<Return>", func=lambda event: refresh())
     refresh_button.pack(padx=5, side="left")
 
-    # <a href="https://www.flaticon.com/free-icons/direct-download" title="direct download icons">
-    # Direct download icons created by Pixel perfect - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/direct-download_2810390?k=1680621808785&log-in=google
     download_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/direct-download.png")).resize(
             size=(16, 16)
@@ -1719,10 +1797,6 @@ try:
     )
     source_button.pack(padx=5, side="left")
 
-    # <a href="https://www.flaticon.com/free-icons/google-play" title="google play icons">
-    # Google play icons created by Pixel perfect - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/google-play_888857?term=google+play&page=1&position=11&origin=search&related_id=888857
     google_play_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(join(base_path, "./assets/google-play.png")).resize((16, 16))
     )
@@ -1733,6 +1807,7 @@ try:
         bg="#00f",
         fg="#fff",
         activeforeground="#fff",
+        activebackground="#3333ff",
         state="disabled",
         compound="left",
         width=100,
@@ -1745,10 +1820,6 @@ try:
     )
     label_frame_3.pack(padx=10, pady=5, fill="both", expand=True)
 
-    # <a href="https://www.flaticon.com/free-icons/google" title="google icons">
-    # Google icons created by Freepik - Flaticon
-    # </a>
-    # https://www.flaticon.com/free-icon/search_281764?term=google&page=1&position=2&origin=search&related_id=281764
     google_ico: PILPhotoImage = PILPhotoImage(
         image=img_open(fp=join(base_path, "./assets/search.png")).resize(size=(80, 80))
     )
@@ -1773,10 +1844,55 @@ try:
 
     # https://www.youtube.com/watch?v=KRuUtNxOb_k&t=466s
     popup_menu: Menu = Menu(master=text_box, tearoff=False)
-    popup_menu.add_command(label="Copy", command=copy_to_clipboard)
+    popup_menu.add_command(
+        label="Copy", accelerator="(Ctrl+C)", command=copy_to_clipboard
+    )
     popup_menu.add_command(label="Read Aloud", command=read_aloud)
     popup_menu.add_separator()
-    popup_menu.add_command(label="Select All")
+    popup_menu.add_command(label="Select All", accelerator="(Ctrl+A)")
+
+    buttons_frame_3: Frame = Frame(master=info_frame, bg=THEME_COLOR["light"])
+    buttons_frame_3.pack(pady=5)
+
+    copy_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(fp=join(base_path, "./assets/copy.png")).resize(size=(16, 16))
+    )
+
+    copy_button: Button = Button(
+        master=buttons_frame_3,
+        text="Copy",
+        bg="orange",
+        fg="#fff",
+        activeforeground="#fff",
+        activebackground="#ffbe00",
+        compound="left",
+        state="disabled",
+        width=100,
+        image=copy_ico,
+        command=copy_to_clipboard,
+    )
+    copy_button.pack(padx=5, side="left")
+
+    megaphone_ico: PILPhotoImage = PILPhotoImage(
+        image=img_open(fp=join(
+        base_path, "./assets/megaphone.png"
+        )).resize(size=(16, 16))
+    )
+
+    read_aloud_button: Button = Button(
+        master=buttons_frame_3,
+        text="Read Aloud",
+        bg="#00f",
+        fg="#fff",
+        activebackground="#3333ff",
+        activeforeground="#fff",
+        compound="left",
+        state="disabled",
+        width=100,
+        image=megaphone_ico,
+        command=read_aloud,
+    )
+    read_aloud_button.pack(padx=5, side="left")
 
     progress_frame: Frame = Frame(master=app, bg=THEME_COLOR["light"])
     progress_frame.pack(fill="x", pady=5)
