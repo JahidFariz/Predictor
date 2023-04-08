@@ -184,6 +184,67 @@ def figlet_banner(font: str) -> None:
     print(f"{F_BLUE}Figlet Font: {font}")
 
 
+def load_tab_1() -> None:
+    """
+    This load_tab_1 function is used to load the graph tab view
+    """
+
+    fig.suptitle(t="Loading...")
+    fig.supxlabel(t="Loading...")
+    fig.supylabel(t="Loading...")
+
+    graph.cla()
+    graph.grid(visible=True)
+    canvas.draw()
+
+
+def load_tab_2() -> None:
+    """
+    This load_tab_2 function is used to load the data tab view
+    """
+
+    tot_data_label.config(text="Loading...")
+    min_val_label.config(text="Loading...")
+    avg_val_label.config(text="Loading...")
+    max_val_label.config(text="Loading...")
+    coef_label.config(text="Loading...")
+    intercept_label.config(text="Loading...")
+    tomorrow_label.config(text="Loading...")
+    next_week_label.config(text="Loading...")
+    next_month_label.config(text="Loading...")
+    next_year_label.config(text="Loading...")
+    status_label.config(text="Loading...")
+    last_update_label.config(text="Loading...")
+
+    source_button.config(state="disabled")
+    google_play_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        source_button.unbind(sequence=_)
+        google_play_button.unbind(sequence=_)
+
+
+def load_tab_3() -> None:
+    """
+    This load_tab_3 function is used to load the info tab view
+    """
+
+    text_box.config(state="normal")
+    text_box.delete(index1=1.0, index2="end")
+    text_box.insert(index=1.0, chars="Loading, Please wait...")
+    text_box.config(state="disabled")
+
+    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
+        text_box.unbind(_)
+
+    copy_button.config(state="disabled")
+    read_aloud_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        copy_button.unbind(sequence=_)
+        read_aloud_button.unbind(sequence=_)
+
+
 def loading_ui(value: int) -> None:
     """
     This loading_ui function is used to load the user interface.
@@ -225,48 +286,9 @@ def loading_ui(value: int) -> None:
         download_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
-    fig.suptitle(t="Loading...")
-    fig.supxlabel(t="Loading...")
-    fig.supylabel(t="Loading...")
-
-    graph.cla()
-    graph.grid(visible=True)
-    canvas.draw()
-
-    tot_data_label.config(text="Loading...")
-    min_val_label.config(text="Loading...")
-    avg_val_label.config(text="Loading...")
-    max_val_label.config(text="Loading...")
-    coef_label.config(text="Loading...")
-    intercept_label.config(text="Loading...")
-    tomorrow_label.config(text="Loading...")
-    next_week_label.config(text="Loading...")
-    next_month_label.config(text="Loading...")
-    next_year_label.config(text="Loading...")
-    status_label.config(text="Loading...")
-    last_update_label.config(text="Loading...")
-
-    source_button.config(state="disabled")
-    google_play_button.config(state="disabled")
-
-    for _ in ["<Left>", "<Right>", "<Return>"]:
-        source_button.unbind(sequence=_)
-        google_play_button.unbind(sequence=_)
-
-    text_box.config(state="normal")
-    text_box.delete(index1=1.0, index2="end")
-    text_box.insert(index=1.0, chars="Loading, Please wait...")
-    text_box.config(state="disabled")
-
-    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
-        text_box.unbind(_)
-
-    copy_button.config(state="disabled")
-    read_aloud_button.config(state="disabled")
-
-    for _ in ["<Left>", "<Right>", "<Return>"]:
-        copy_button.unbind(sequence=_)
-        read_aloud_button.unbind(sequence=_)
+    load_tab_1()
+    load_tab_2()
+    load_tab_3()
 
     progress_bar.config(value=0)
     percentage_label.config(text="0.00%")
@@ -365,7 +387,12 @@ def display_data(data, total_records: int) -> None:
             state="normal",
             command=lambda: browser(url="https://www.google.com/finance/quote/USD-INR"),
         )
-        source_button.bind(sequence="<Return>", func=lambda event: browser(url="https://www.google.com/finance/quote/USD-INR"))
+        source_button.bind(
+            sequence="<Return>",
+            func=lambda event: browser(
+                url="https://www.google.com/finance/quote/USD-INR"
+            ),
+        )
         google_play_button.config(state="disabled")
 
         for _ in ["<Left>", "<Right>"]:
@@ -385,14 +412,22 @@ def display_data(data, total_records: int) -> None:
             state="normal",
             command=lambda: browser(url="https://www.mmtcpamp.com/"),
         )
-        source_button.bind(sequence="<Return>", func=lambda event: browser(url="https://www.mmtcpamp.com/"))
+        source_button.bind(
+            sequence="<Return>",
+            func=lambda event: browser(url="https://www.mmtcpamp.com/"),
+        )
         google_play_button.config(
             state="normal",
             command=lambda: browser(
                 url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"
             ),
         )
-        google_play_button.bind(sequence="<Return>", func=lambda event: browser(url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"))
+        google_play_button.bind(
+            sequence="<Return>",
+            func=lambda event: browser(
+                url="https://play.google.com/store/apps/details?id=com.mmtcpamp.app"
+            ),
+        )
 
         for _ in ["<Left>", "<Right>"]:
             source_button.bind(
@@ -449,6 +484,66 @@ def display_info() -> None:
     app.update()
 
 
+def reset_tab_1() -> None:
+    """
+    This reset_tab_1 function is used to reset the graph tab view
+    """
+    fig.suptitle(t="Graph Area")
+    fig.supxlabel(t="X-Axis")
+    fig.supylabel(t="Y-Axis")
+
+    graph.cla()
+    graph.grid(visible=True)
+    canvas.draw()
+
+
+def reset_tab_2() -> None:
+    """
+    This reset_tab_2 function is used to teset the data tab view
+    """
+
+    tot_data_label.config(text="0")
+    min_val_label.config(text="0.00")
+    avg_val_label.config(text="0.00")
+    max_val_label.config(text="0.00")
+    coef_label.config(text="0.00")
+    intercept_label.config(text="0.00")
+    tomorrow_label.config(text="0.00")
+    next_week_label.config(text="0.00")
+    next_month_label.config(text="0.00")
+    next_year_label.config(text="0.00")
+    status_label.config(text="N/A")
+    last_update_label.config(text="N/A")
+
+    source_button.config(state="disabled")
+    google_play_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        source_button.unbind(sequence=_)
+        google_play_button.unbind(sequence=_)
+
+
+def reset_tab_3() -> None:
+    """
+    This reset_tab_3 function is used to reset the info tab view
+    """
+
+    text_box.config(state="normal")
+    text_box.delete(index1=1.0, index2="end")
+    text_box.insert(index=1.0, chars="No information available...")
+    text_box.config(state="disabled")
+
+    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
+        text_box.unbind(sequence=_)
+
+    copy_button.config(state="disabled")
+    read_aloud_button.config(state="disabled")
+
+    for _ in ["<Left>", "<Right>", "<Return>"]:
+        copy_button.unbind(sequence=_)
+        read_aloud_button.unbind(sequence=_)
+
+
 def reset_ui():
     """
     This reset_ui function is used to reset the user interface
@@ -488,48 +583,9 @@ def reset_ui():
         download_button.unbind(sequence=_)
         exit_button.unbind(sequence=_)
 
-    fig.suptitle(t="Graph Area")
-    fig.supxlabel(t="X-Axis")
-    fig.supylabel(t="Y-Axis")
-
-    graph.cla()
-    graph.grid(visible=True)
-    canvas.draw()
-
-    tot_data_label.config(text="0")
-    min_val_label.config(text="0.00")
-    avg_val_label.config(text="0.00")
-    max_val_label.config(text="0.00")
-    coef_label.config(text="0.00")
-    intercept_label.config(text="0.00")
-    tomorrow_label.config(text="0.00")
-    next_week_label.config(text="0.00")
-    next_month_label.config(text="0.00")
-    next_year_label.config(text="0.00")
-    status_label.config(text="N/A")
-    last_update_label.config(text="N/A")
-
-    source_button.config(state="disabled")
-    google_play_button.config(state="disabled")
-
-    for _ in ["<Left>", "<Right>", "<Return>"]:
-        source_button.unbind(sequence=_)
-        google_play_button.unbind(sequence=_)
-
-    text_box.config(state="normal")
-    text_box.delete(index1=1.0, index2="end")
-    text_box.insert(index=1.0, chars="No information available...")
-    text_box.config(state="disabled")
-
-    for _ in ["<Button-3>", "<Control-C>", "<Control-c>"]:
-        text_box.unbind(sequence=_)
-
-    copy_button.config(state="disabled")
-    read_aloud_button.config(state="disabled")
-
-    for _ in ["<Left>", "<Right>", "<Return>"]:
-        copy_button.unbind(sequence=_)
-        read_aloud_button.unbind(sequence=_)
+    reset_tab_1()
+    reset_tab_2()
+    reset_tab_3()
 
     footer_label.config(
         text="Created by FOSS KINGDOM, Made with Love in Incredible India."
@@ -1874,9 +1930,9 @@ try:
     copy_button.pack(padx=5, side="left")
 
     megaphone_ico: PILPhotoImage = PILPhotoImage(
-        image=img_open(fp=join(
-        base_path, "./assets/megaphone.png"
-        )).resize(size=(16, 16))
+        image=img_open(fp=join(base_path, "./assets/megaphone.png")).resize(
+            size=(16, 16)
+        )
     )
 
     read_aloud_button: Button = Button(
